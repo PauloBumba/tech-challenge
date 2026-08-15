@@ -1,3 +1,4 @@
+using Desafio.Api.Dominio.Comum;
 using Desafio.Api.Dominio.Enums;
 using Desafio.Api.Dominio.Excecoes;
 using Desafio.Api.Dominio.Validadores;
@@ -6,6 +7,8 @@ namespace Desafio.Api.Dominio.Entidades;
 
 public class Beneficiario
 {
+    private static readonly ITimeProvider TimeProvider = new SystemTimeProvider();
+
     private Beneficiario()
     {
     }
@@ -19,7 +22,7 @@ public class Beneficiario
     {
         Id = id;
         Status = StatusBeneficiario.ATIVO;
-        DataCadastro = DateTime.UtcNow;
+        DataCadastro = TimeProvider.UtcNow;
         DefinirDados(nomeCompleto, cpf, dataNascimento, planoId);
     }
 
@@ -52,37 +55,18 @@ public class Beneficiario
 
         var detalhes = new List<DetalheErro>();
 
-        if (nomeCompleto.Length == 0)
-        {
-            detalhes.Add(new DetalheErro("nome_completo", "obrigatorio"));
-        }
-        else if (nomeCompleto.Length is < 3 or > 120)
-        {
-            detalhes.Add(new DetalheErro("nome_completo", "tamanho_invalido"));
-        }
+        ValidadorCampo.Obrigatorio("nome_completo", nomeCompleto, detalhes);
+        ValidadorCampo.TamanhoInvalido("nome_completo", nomeCompleto, 3, 120, detalhes);
+        ValidadorCampo.Obrigatorio("cpf", cpf, detalhes);
 
-        if (cpf.Length == 0)
-        {
-            detalhes.Add(new DetalheErro("cpf", "obrigatorio"));
-        }
-        else if (!CpfValidator.Validar(cpf))
+        if (cpf.Length > 0 && !CpfValidator.Validar(cpf))
         {
             detalhes.Add(new DetalheErro("cpf", "formato_invalido"));
         }
 
-        if (dataNascimento is null)
-        {
-            detalhes.Add(new DetalheErro("data_nascimento", "obrigatorio"));
-        }
-        else if (dataNascimento.Value >= DateOnly.FromDateTime(DateTime.UtcNow))
-        {
-            detalhes.Add(new DetalheErro("data_nascimento", "data_futura"));
-        }
-
-        if (planoId is null)
-        {
-            detalhes.Add(new DetalheErro("plano_id", "obrigatorio"));
-        }
+        ValidadorCampo.Obrigatorio("data_nascimento", dataNascimento, detalhes);
+        ValidadorCampo.DataFutura("data_nascimento", dataNascimento, detalhes, TimeProvider);
+        ValidadorCampo.Obrigatorio("plano_id", planoId, detalhes);
 
         if (detalhes.Count > 0)
         {
@@ -119,28 +103,11 @@ public class Beneficiario
 
         var detalhes = new List<DetalheErro>();
 
-        if (nomeCompleto.Length == 0)
-        {
-            detalhes.Add(new DetalheErro("nome_completo", "obrigatorio"));
-        }
-        else if (nomeCompleto.Length is < 3 or > 120)
-        {
-            detalhes.Add(new DetalheErro("nome_completo", "tamanho_invalido"));
-        }
-
-        if (dataNascimento is null)
-        {
-            detalhes.Add(new DetalheErro("data_nascimento", "obrigatorio"));
-        }
-        else if (dataNascimento.Value >= DateOnly.FromDateTime(DateTime.UtcNow))
-        {
-            detalhes.Add(new DetalheErro("data_nascimento", "data_futura"));
-        }
-
-        if (planoId is null)
-        {
-            detalhes.Add(new DetalheErro("plano_id", "obrigatorio"));
-        }
+        ValidadorCampo.Obrigatorio("nome_completo", nomeCompleto, detalhes);
+        ValidadorCampo.TamanhoInvalido("nome_completo", nomeCompleto, 3, 120, detalhes);
+        ValidadorCampo.Obrigatorio("data_nascimento", dataNascimento, detalhes);
+        ValidadorCampo.DataFutura("data_nascimento", dataNascimento, detalhes, TimeProvider);
+        ValidadorCampo.Obrigatorio("plano_id", planoId, detalhes);
 
         if (detalhes.Count > 0)
         {
@@ -153,5 +120,5 @@ public class Beneficiario
         Status = status;
     }
 
-    public void Excluir() => ExcluidoEm = DateTime.UtcNow;
+    public void Excluir() => ExcluidoEm = TimeProvider.UtcNow;
 }

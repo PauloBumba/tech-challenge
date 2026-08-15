@@ -1,10 +1,14 @@
+
 using System.Text.RegularExpressions;
+using Desafio.Api.Dominio.Comum;
 using Desafio.Api.Dominio.Excecoes;
 
 namespace Desafio.Api.Dominio.Entidades;
 
 public partial class Plano
 {
+    private static readonly ITimeProvider TimeProvider = new SystemTimeProvider();
+
     private Plano()
     {
     }
@@ -35,23 +39,10 @@ public partial class Plano
 
         var detalhes = new List<DetalheErro>();
 
-        if (nome.Length == 0)
-        {
-            detalhes.Add(new DetalheErro("nome", "obrigatorio"));
-        }
-        else if (nome.Length is < 3 or > 60)
-        {
-            detalhes.Add(new DetalheErro("nome", "tamanho_invalido"));
-        }
-
-        if (codigoRegistroAns.Length == 0)
-        {
-            detalhes.Add(new DetalheErro("codigo_registro_ans", "obrigatorio"));
-        }
-        else if (!FormatoDoCodigoAns().IsMatch(codigoRegistroAns))
-        {
-            detalhes.Add(new DetalheErro("codigo_registro_ans", "formato_invalido"));
-        }
+        ValidadorCampo.Obrigatorio("nome", nome, detalhes);
+        ValidadorCampo.TamanhoInvalido("nome", nome, 3, 60, detalhes);
+        ValidadorCampo.Obrigatorio("codigo_registro_ans", codigoRegistroAns, detalhes);
+        ValidadorCampo.FormatoInvalido("codigo_registro_ans", codigoRegistroAns, "^[0-9]{6}$", detalhes);
 
         if (detalhes.Count > 0)
         {
@@ -62,7 +53,7 @@ public partial class Plano
         CodigoRegistroAns = codigoRegistroAns;
     }
 
-    public void Excluir() => ExcluidoEm = DateTime.UtcNow;
+    public void Excluir() => ExcluidoEm = TimeProvider.UtcNow;
 
     [GeneratedRegex("^[0-9]{6}$")]
     private static partial Regex FormatoDoCodigoAns();
