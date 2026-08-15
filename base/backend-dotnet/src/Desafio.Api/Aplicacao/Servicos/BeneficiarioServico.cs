@@ -35,12 +35,42 @@ public class BeneficiarioServico(AppDbContext db)
         return beneficiario;
     }
 
+    // Sem AsNoTracking de propósito, como PlanoServico.ObterAsync: o registro retornado aqui
+    // é usado também por AtualizarAsync, que precisa de entidade rastreada para persistir.
     public async Task<Beneficiario> ObterAsync(Guid id, CancellationToken cancellationToken)
     {
-        return await db.Beneficiarios
-                   .AsNoTracking()
-                   .FirstOrDefaultAsync(b => b.Id == id, cancellationToken)
+        return await db.Beneficiarios.FirstOrDefaultAsync(b => b.Id == id, cancellationToken)
                ?? throw new NaoEncontradoException("Beneficiário não encontrado");
+    }
+
+    public async Task<Beneficiario> AtualizarAsync(
+        Guid id,
+        BeneficiarioRequestDados dados,
+        CancellationToken cancellationToken)
+    {
+        var beneficiario = await ObterAsync(id, cancellationToken);
+
+        if (dados.PlanoId is not null)
+        {
+            await GarantirPlanoExisteAsync(dados.PlanoId.Value, cancellationToken);
+        }
+
+        if (dados.Status is null)
+        {
+            throw new ValidacaoException(
+                "Dados do beneficiário inválidos",
+                [new DetalheErro("status", "obrigatorio")]);
+        }
+
+        beneficiario.AtualizarDados(
+            dados.NomeCompleto,
+            dados.DataNascimento,
+            dados.PlanoId,
+            dados.Status.Value);
+
+        await SalvarAsync(cancellationToken);
+
+        return beneficiario;
     }
 
     public async Task<PaginaDeBeneficiarios> ListarAsync(

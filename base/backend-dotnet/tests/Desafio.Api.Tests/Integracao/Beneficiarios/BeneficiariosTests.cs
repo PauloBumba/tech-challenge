@@ -285,7 +285,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task Atualizar_dados_de_beneficiario_inativo_deve_devolver_200()
+    public async Task Atualizar_dados_de_beneficiario_inativo_deve_devolver_409()
     {
         var beneficiario = (await fixture.SemearBeneficiariosAsync(
             1, PlanosSeed.Bronze, "INATIVO", 500)).Single();
@@ -298,9 +298,26 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
             Status = "INATIVO"
         }));
 
+        Assert.Equal(HttpStatusCode.Conflict, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Atualizar_deve_permitir_reativacao_de_beneficiario_inativo()
+    {
+        var beneficiario = (await fixture.SemearBeneficiariosAsync(
+            1, PlanosSeed.Bronze, "INATIVO", 500)).Single();
+
+        var resposta = await Client.PutAsync($"/beneficiarios/{beneficiario.Id}", Http.Json(new
+        {
+            NomeCompleto = beneficiario.NomeCompleto,
+            DataNascimento = beneficiario.DataNascimento,
+            PlanoId = PlanosSeed.Bronze,
+            Status = "ATIVO"
+        }));
+
         Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
 
         var corpo = await resposta.CorpoAsync();
-        Assert.Equal("Nome Corrigido do Inativo", corpo.GetProperty("nome_completo").GetString());
+        Assert.Equal("ATIVO", corpo.GetProperty("status").GetString());
     }
 }

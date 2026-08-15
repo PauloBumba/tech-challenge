@@ -8,7 +8,8 @@ public sealed record BeneficiarioRequest(
     string? NomeCompleto,
     string? Cpf,
     DateOnly? DataNascimento,
-    Guid? PlanoId);
+    Guid? PlanoId,
+    StatusBeneficiario? Status = null);
 
 public sealed record BeneficiarioResponse(
     Guid Id,
