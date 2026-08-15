@@ -1,58 +1,23 @@
-using Desafio.Api.Api.Contratos;
+using Desafio.Api.Api;
 using Desafio.Api.Api.Middlewares;
-using Desafio.Api.Aplicacao.Servicos;
-using Desafio.Api.Dominio.Excecoes;
+using Desafio.Api.Aplicacao;
 using Desafio.Api.Infraestrutura;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-
-const string PoliticaDaWeb = "web";
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Logging.ClearProviders();
 builder.Logging.AddJsonConsole();
 
-builder.Services.AddDbContext<AppDbContext>(opcoes =>
-    opcoes.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
-
-builder.Services.AddScoped<PlanoServico>();
-builder.Services.AddScoped<BeneficiarioServico>();
-
-// A interface web roda em outra origem (porta 4200) e o navegador bloqueia a chamada sem isto.
-builder.Services.AddCors(opcoes => opcoes.AddPolicy(
-    PoliticaDaWeb,
-    politica => politica
-        .WithOrigins("http://localhost:4200")
-        .AllowAnyHeader()
-        .AllowAnyMethod()));
-
-builder.Services
-    .AddControllers()
-    .AddJsonOptions(opcoes => JsonPadrao.Aplicar(opcoes.JsonSerializerOptions));
-
-builder.Services.Configure<ApiBehaviorOptions>(opcoes =>
-{
-    opcoes.InvalidModelStateResponseFactory = contexto =>
-    {
-        var detalhes = contexto.ModelState
-            .Where(entrada => entrada.Value is { Errors.Count: > 0 })
-            .Select(entrada => new DetalheErro(NormalizarCampo(entrada.Key), "invalido"))
-            .ToList();
-
-        return new BadRequestObjectResult(
-            new ErroResponse("ValidacaoInvalida", "Corpo da requisição inválido", detalhes));
-    };
-});
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddInfraestrutura(builder.Configuration);
+builder.Services.AddAplicacao();
+builder.Services.AddApi();
 
 var app = builder.Build();
 
 app.UseMiddleware<TratamentoDeErroMiddleware>();
 
-app.UseCors(PoliticaDaWeb);
+app.UseCors(DependenciasDaApi.PoliticaDaWeb);
 
 app.UseSwagger();
 app.UseSwaggerUI(opcoes => opcoes.RoutePrefix = "swagger");
@@ -62,9 +27,6 @@ app.MapControllers();
 await PrepararBancoAsync(app);
 
 app.Run();
-
-static string NormalizarCampo(string chave) =>
-    chave.StartsWith("$.", StringComparison.Ordinal) ? chave[2..] : chave;
 
 static async Task PrepararBancoAsync(WebApplication app)
 {
