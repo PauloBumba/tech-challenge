@@ -35,6 +35,14 @@ public class BeneficiarioServico(AppDbContext db)
         return beneficiario;
     }
 
+    public async Task<Beneficiario> ObterAsync(Guid id, CancellationToken cancellationToken)
+    {
+        return await db.Beneficiarios
+                   .AsNoTracking()
+                   .FirstOrDefaultAsync(b => b.Id == id, cancellationToken)
+               ?? throw new NaoEncontradoException("Beneficiário não encontrado");
+    }
+
     public async Task<PaginaDeBeneficiarios> ListarAsync(
         BeneficiarioFiltro filtro,
         CancellationToken cancellationToken)

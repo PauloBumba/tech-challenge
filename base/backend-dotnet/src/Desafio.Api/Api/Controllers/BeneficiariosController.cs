@@ -12,6 +12,16 @@ namespace Desafio.Api.Api.Controllers;
 [Produces("application/json")]
 public class BeneficiariosController(BeneficiarioServico servico) : ControllerBase
 {
+    [HttpGet("{id:guid}")]
+    [ProducesResponseType<BeneficiarioResponse>(StatusCodes.Status200OK)]
+    [ProducesResponseType<ErroResponse>(StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Obter(Guid id, CancellationToken cancellationToken)
+    {
+        var beneficiario = await servico.ObterAsync(id, cancellationToken);
+
+        return Ok(BeneficiarioResponse.De(beneficiario));
+    }
+
     [HttpPost]
     [ProducesResponseType<BeneficiarioResponse>(StatusCodes.Status201Created)]
     [ProducesResponseType<ErroResponse>(StatusCodes.Status400BadRequest)]
@@ -29,9 +39,7 @@ public class BeneficiariosController(BeneficiarioServico servico) : ControllerBa
 
         var beneficiario = await servico.CriarAsync(dados, cancellationToken);
 
-        // CreatedAtAction (padrão de Planos) exigiria a action Obter, que é a TASK-BEN-03.
-        // Até lá, a URL é montada explicitamente para o header Location não depender dela.
-        return Created($"/beneficiarios/{beneficiario.Id}", BeneficiarioResponse.De(beneficiario));
+        return CreatedAtAction(nameof(Obter), new { id = beneficiario.Id }, BeneficiarioResponse.De(beneficiario));
     }
 
     [HttpGet]
