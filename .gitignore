@@ -29,3 +29,9 @@ Thumbs.db
 .claude/
 # Artefatos de ferramenta local
 .playwright-mcp/
+
+# processo interno de trabalho / uso de IA — nunca rastreado, nunca no diff do PR
+/governance/
+/CLAUDE.md
+/.githooks/
+/.opencode/
