@@ -1,0 +1,84 @@
+# AI_USAGE.md
+
+Log cru de uso de IA por task, preenchido durante o trabalho — vira insumo direto da seção
+"Uso de IA" do README de entrega e um candidato natural para a pergunta de compreensão nº 3
+("o trecho mais complexo que a IA gerou").
+
+Formato:
+
+```
+### [TASK-ID]
+- **Nível de uso:** gerado do zero pela IA / IA como par (sugestão + revisão) / só revisão / sem IA
+- **Prompt que mais influenciou o resultado:** (resumo, não precisa ser literal)
+- **Trecho não trivial gerado:** arquivo + o que faz, em uma frase
+- **Ainda não explicaria com segurança:** sim/não — se sim, o quê e por quê
+```
+
+---
+
+### [ADR-026]
+- **Nível de uso:** só revisão — política de segredos adaptada pelo Paulo, aplicada com revisão da IA
+- **Prompt que mais influenciou o resultado:** "não pode ter credencial no código ou teste"
+- **Trecho não trivial gerado:** `AppDbContextFactory.cs` — remoção do fallback hardcoded e erro
+  orientando a definir `ConnectionStrings__Postgres`
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-ARCH-03]
+- **Nível de uso:** só revisão — a correção estrutural foi pedida explicitamente pelo Paulo
+  ("usa o pensamento de Clean Architecture — teria uma camada para enum, outra para entidade,
+  outra para exceção")
+- **Prompt que mais influenciou o resultado:** "esta errado ... usa o pensamento de clean
+  architecture ... uma camada para enum outra para entidade ou para exceção"
+- **Trecho não trivial gerado:** `Dominio/Excecoes/*.cs` — divisão do `Excecoes.cs` monolítico
+  em um arquivo por exceção (um tipo por arquivo, SOLID), mantendo o namespace unificado
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-ARCH-04]
+- **Nível de uso:** IA como par — a IA executou a reorganização estrutural e escreveu os
+  testes unitários do domínio sob pedido explícito do Paulo
+- **Prompt que mais influenciou o resultado:** "os testes precisam seguir também a arquitetura
+  — testes de integração, unitários e E2E"
+- **Trecho não trivial gerado:** `Unitarios/Dominio/Entidades/BeneficiarioTests.cs` — a Theory
+  de casos-limite (nome curto/longo, CPF fora do formato) espelha exatamente as regras que o
+  `DefinirDados` da entidade valida, com o detalhe `DetalheErro(campo, regra)` por campo
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-ARCH-05]
+- **Nível de uso:** só revisão — o padrão de composition root por camada foi pedido pelo Paulo
+  ("cria uma injeção de dependência por camada e depois registrar isso no program pra não
+  poluir o program.cs")
+- **Prompt que mais influenciou o resultado:** "cria uma injeção de dependência por camada e
+  depois registrar isso no program"
+- **Trecho não trivial gerado:** `Api/Dependencias.cs` — `AddApi` concentra toda a configuração
+  de apresentação (CORS, JSON, model state → `ErroResponse`, Swagger) e expõe a constante
+  `PoliticaDaWeb` consumida pelo `Program.cs`
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-BEN-04]
+- **Nível de uso:** IA como par — o Paulo decidiu a divergência D20 (INATIVO congelado → 409)
+  e a IA implementou `AtualizarAsync`/`AtualizarDados`
+- **Prompt que mais influenciou o resultado:** decisão do Paulo "seguir a spec (409)" para o
+  conflito entre SPEC 2.3 (INATIVO congelado) e o teste público (esperava 200)
+- **Trecho não trivial gerado:** `AtualizarDados` na entidade — a regra que compara os dados
+  cadastrais atuais com os recebidos e lança `ConflitoException` (409) só quando o
+  beneficiário está `INATIVO`, permitindo a reativação (mudança de status sozinha)
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-BEN-08]
+- **Nível de uso:** IA como par — a IA implementou o validador completo de CPF seguindo TDD
+- **Prompt que mais influenciou o resultado:** "lembra antes executar o tdd" — seguiu TDD
+  estritamente: teste RED → implementação GREEN → commit
+- **Trecho não trivial gerado:** `CpfValidator.CalcularDigitoVerificador` — algoritmo oficial
+  do CPF brasileiro (peso 10→2 e 11→2, resto < 2 → 0 senão 11-resto) com comentário explicando
+  o algoritmo
+- **Ainda não explicaria com segurança:** não
