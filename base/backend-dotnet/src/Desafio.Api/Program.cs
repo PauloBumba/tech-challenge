@@ -1,7 +1,9 @@
 using Desafio.Api.Api;
 using Desafio.Api.Api.Middlewares;
 using Desafio.Api.Aplicacao;
-using Desafio.Api.Infraestrutura;
+using Desafio.Api.Infraestrutura.Configuration;
+using Desafio.Api.Infraestrutura.Persistence;
+using CargaInicial = Desafio.Api.Infraestrutura.Persistence.CargaInicial;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);

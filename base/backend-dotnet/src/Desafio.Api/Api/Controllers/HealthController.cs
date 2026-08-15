@@ -1,4 +1,4 @@
-using Desafio.Api.Infraestrutura;
+using Desafio.Api.Infraestrutura.Persistence;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 

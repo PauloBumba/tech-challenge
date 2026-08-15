@@ -1,5 +1,5 @@
 using Desafio.Api.Dominio;
-using Desafio.Api.Infraestrutura;
+using Desafio.Api.Infraestrutura.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;

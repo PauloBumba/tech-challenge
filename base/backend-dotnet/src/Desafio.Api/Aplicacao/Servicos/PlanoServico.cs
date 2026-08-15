@@ -1,7 +1,7 @@
 using Desafio.Api.Aplicacao.Contratos;
 using Desafio.Api.Dominio.Entidades;
 using Desafio.Api.Dominio.Excecoes;
-using Desafio.Api.Infraestrutura;
+using Desafio.Api.Infraestrutura.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
