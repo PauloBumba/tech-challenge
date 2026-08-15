@@ -67,20 +67,21 @@ base/backend-dotnet/
 ├── Desafio.sln
 ├── Dockerfile                     imagem da API, multi-stage
 └── src/Desafio.Api/
-    ├── Dominio/                   entidades e regras de negócio, sem dependência de framework
-    │   ├── Plano.cs
-    │   ├── Beneficiario.cs
-    │   └── Excecoes.cs            exceções de domínio e o status HTTP de cada uma
+    ├── Dominio/                   regras de negócio, sem dependência de framework
+    │   ├── Entidades/             Plano.cs, Beneficiario.cs
+    │   ├── Enums/                 StatusBeneficiario.cs
+    │   └── Excecoes/              exceções de domínio e o status HTTP de cada uma
     ├── Aplicacao/                 orquestração dos casos de uso
-    │   └── PlanoServico.cs
+    │   ├── Servicos/              PlanoServico.cs, BeneficiarioServico.cs
+    │   └── Contratos/             DTOs de entrada e de filtro/paginação
     ├── Infraestrutura/            acesso a dados
     │   ├── AppDbContext.cs
     │   ├── CargaInicial.cs
     │   └── Migrations/
-    ├── Api/
-    │   ├── Contratos/             DTOs de entrada e saída, e a configuração de JSON
+    ├── Api/                       apresentação
+    │   ├── Controllers/
+    │   ├── Contratos/             DTOs de saída e a configuração de JSON
     │   └── Middlewares/           tratamento centralizado de erro
-    ├── Controllers/
     └── Program.cs
 ```
 
