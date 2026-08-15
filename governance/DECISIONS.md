@@ -244,3 +244,19 @@ Formato:
   e respeita o filter), mas beneficiários não têm filter dependente de Plano, então continuam
   acessíveis mesmo quando o plano é excluído. Nenhuma mudança de código necessária, apenas
   validação por testes
+
+### [TASK-BEN-10] Tratamento de erro centralizado — já implementado via middleware
+- **Situação:** validação de funcionalidade existente — SPEC 5 exige tratamento de erro
+  centralizado com corpo JSON estruturado
+- **O que a spec diz:** SPEC 5 — "Respostas de erro têm corpo JSON descrevendo o problema,
+  com detalhamento suficiente para o cliente identificar qual campo foi recusado e por quê.
+  O tratamento é centralizado: erros não previstos não podem vazar stack trace nem detalhes
+  internos ao cliente, e resultam em 500 com corpo no mesmo formato dos demais erros"
+- **Decisão:** funcionalidade já estava implementada corretamente via `TratamentoDeErroMiddleware`
+  (captura `ExcecaoDeDominio` e `Exception`, converte em `ErroResponse` com estrutura JSON).
+  Adicionados testes de integração como evidência: 400/404/409/422 retornam corpo JSON com campo
+  `erro` e array `detalhes`
+- **Porquê:** o middleware centralizado já captura todas as exceções de domínio (`ValidacaoException`,
+  `ConflitoException`, `NaoEncontradoException`, `NaoProcessavelException`) e retorna resposta
+  JSON estruturada; exceções não previstas resultam em 500 com `ErroInterno` sem vazar stack trace.
+  Nenhuma mudança de código necessária, apenas validação por testes

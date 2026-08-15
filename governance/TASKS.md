@@ -102,6 +102,10 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       novos vínculos, mas não invalida vínculos existentes (SPEC 4.2). **Feito 2026-08-14**:
       funcionalidade já implementada via query filter em `AppDbContext`; adicionados 2 testes
       de integração como evidência — 79/79 GREEN (ver `ai-change-records/TASK-BEN-09.md`).
+- [x] **TASK-BEN-10** — Confirmar tratamento de erro centralizado (400/404/409/422/500) para
+      Beneficiários, seguindo o padrão de Planos (SPEC 5). **Feito 2026-08-14**: funcionalidade
+      já implementada via `TratamentoDeErroMiddleware`; adicionados 4 testes de integração como
+      evidência — 79/79 GREEN (ver `ai-change-records/TASK-BEN-10.md`).
 
 ## Fase 3 — Frontend, módulo Beneficiários
 

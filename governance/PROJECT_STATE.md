@@ -4,7 +4,7 @@ Atualizar a cada commit (Seção 3 do `AGENTS.md`). Tamanho fixo — resumo, nã
 completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 
 **Última atualização:** 2026-08-14
-**Última TASK concluída:** TASK-BEN-09 (regras de exclusão lógica de planos — validação via query filter)
+**Última TASK concluída:** TASK-BEN-10 (tratamento de erro centralizado — validação via middleware)
 **Testes:** `dotnet test` — **79/79 GREEN** (suíte inteira)
 
 ### Backend — `Desafio.Api`
@@ -22,7 +22,7 @@ completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 || Concorrência de CPF único | não verificado | garantido (índice único + 23505→409) | TASK-BEN-07 |
 || Validador de CPF completo (dígitos verificadores, sequências repetidas) | parcial (só formato) | implementado (GREEN) | TASK-BEN-08 |
 || Regras de exclusão lógica (plano/beneficiário) | a validar | validado (GREEN) | TASK-BEN-09 |
-|| Tratamento de erro centralizado (400/404/409/422/500) | existe para Planos, a validar para Beneficiários | pendente | TASK-BEN-10 |
+|| Tratamento de erro centralizado (400/404/409/422/500) | existe para Planos, a validar para Beneficiários | validado (GREEN) | TASK-BEN-10 |
 || Testes escritos para o que for implementado | — | pendente | (por task) |
 
 | Item | Situação inicial | Situação atual | Task |
