@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 
-namespace Desafio.Api.Tests;
+namespace Desafio.Api.Tests.Integracao;
 
 /// <summary>
 /// Sobe um PostgreSQL descartável em container e a API apontando para ele.
@@ -96,7 +96,7 @@ public sealed class ApiFixture : IAsyncLifetime
                 GeradorDeCpf.Gerar(semente),
                 new DateOnly(1990, 1, 1).AddDays(semente),
                 status,
-                planoId ?? Planos.Bronze))
+                planoId ?? PlanosSeed.Bronze))
             .ToList();
 
         await UsarBancoAsync(async db =>

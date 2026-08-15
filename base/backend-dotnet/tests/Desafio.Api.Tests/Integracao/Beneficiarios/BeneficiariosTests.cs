@@ -1,5 +1,7 @@
 using System.Net;
-namespace Desafio.Api.Tests;
+using Desafio.Api.Tests.Integracao;
+
+namespace Desafio.Api.Tests.Integracao.Beneficiarios;
 
 [Collection(ColecaoDaApi.Nome)]
 public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
@@ -15,7 +17,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         NomeCompleto = "Maria Aparecida da Silva",
         Cpf = cpf,
         DataNascimento = "1990-05-12",
-        PlanoId = planoId ?? Planos.Bronze
+        PlanoId = planoId ?? PlanosSeed.Bronze
     };
 
     // ------------------------------------------------------------------ criação
@@ -49,7 +51,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     {
         var resposta = await Client.PostAsync(
             "/beneficiarios",
-            Http.Json(CorpoDeCriacao("39053344705", Planos.Inexistente)));
+            Http.Json(CorpoDeCriacao("39053344705", PlanosSeed.Inexistente)));
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
     }
@@ -63,7 +65,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
             NomeCompleto = "Maria Aparecida da Silva",
             Cpf = "52998224725",
             DataNascimento = "1990-05-12",
-            PlanoId = Planos.Bronze,
+            PlanoId = PlanosSeed.Bronze,
             Status = "INATIVO",
             DataCadastro = "2020-01-01T00:00:00Z"
         }));
@@ -83,7 +85,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         {
             Cpf = "52998224725",
             DataNascimento = "1990-05-12",
-            PlanoId = Planos.Bronze
+            PlanoId = PlanosSeed.Bronze
         }));
 
         Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
@@ -105,7 +107,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
             NomeCompleto = "Maria Aparecida da Silva",
             Cpf = "52998224725",
             DataNascimento = "2099-01-01",
-            PlanoId = Planos.Bronze
+            PlanoId = PlanosSeed.Bronze
         }));
 
         Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
@@ -125,7 +127,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         var corpo = await resposta.CorpoAsync();
         Assert.Equal(beneficiario.Id, corpo.GetProperty("id").GetGuid());
         Assert.Equal(beneficiario.Cpf, corpo.GetProperty("cpf").GetString());
-        Assert.Equal(Planos.Bronze, corpo.GetProperty("plano_id").GetGuid());
+        Assert.Equal(PlanosSeed.Bronze, corpo.GetProperty("plano_id").GetGuid());
     }
 
     [Fact]
@@ -147,7 +149,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         {
             NomeCompleto = "Joana Ribeiro Nunes",
             DataNascimento = "1985-03-20",
-            PlanoId = Planos.Ouro,
+            PlanoId = PlanosSeed.Ouro,
             Status = "ATIVO"
         }));
 
@@ -155,7 +157,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
 
         var corpo = await resposta.CorpoAsync();
         Assert.Equal("Joana Ribeiro Nunes", corpo.GetProperty("nome_completo").GetString());
-        Assert.Equal(Planos.Ouro, corpo.GetProperty("plano_id").GetGuid());
+        Assert.Equal(PlanosSeed.Ouro, corpo.GetProperty("plano_id").GetGuid());
     }
 
     [Fact]
@@ -165,7 +167,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         {
             NomeCompleto = "Nao Existe",
             DataNascimento = "1985-03-20",
-            PlanoId = Planos.Ouro,
+            PlanoId = PlanosSeed.Ouro,
             Status = "ATIVO"
         }));
 
@@ -181,7 +183,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         {
             NomeCompleto = "Maria Aparecida da Silva",
             DataNascimento = "1990-05-12",
-            PlanoId = Planos.Inexistente,
+            PlanoId = PlanosSeed.Inexistente,
             Status = "ATIVO"
         }));
 
@@ -253,12 +255,12 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task Listar_deve_combinar_os_filtros_de_status_e_plano()
     {
-        await fixture.SemearBeneficiariosAsync(4, Planos.Bronze, "ATIVO", 100);
-        await fixture.SemearBeneficiariosAsync(6, Planos.Bronze, "INATIVO", 200);
-        await fixture.SemearBeneficiariosAsync(3, Planos.Prata, "ATIVO", 300);
+        await fixture.SemearBeneficiariosAsync(4, PlanosSeed.Bronze, "ATIVO", 100);
+        await fixture.SemearBeneficiariosAsync(6, PlanosSeed.Bronze, "INATIVO", 200);
+        await fixture.SemearBeneficiariosAsync(3, PlanosSeed.Prata, "ATIVO", 300);
 
         var corpo = await (await Client.GetAsync(
-            $"/beneficiarios?tamanho=50&status=ATIVO&plano_id={Planos.Bronze}")).CorpoAsync();
+            $"/beneficiarios?tamanho=50&status=ATIVO&plano_id={PlanosSeed.Bronze}")).CorpoAsync();
 
         Assert.Equal(4, corpo.GetProperty("total").GetInt32());
         Assert.All(
@@ -266,7 +268,7 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
             beneficiario =>
             {
                 Assert.Equal("ATIVO", beneficiario.GetProperty("status").GetString());
-                Assert.Equal(Planos.Bronze, beneficiario.GetProperty("plano_id").GetGuid());
+                Assert.Equal(PlanosSeed.Bronze, beneficiario.GetProperty("plano_id").GetGuid());
             });
     }
 
@@ -286,13 +288,13 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     public async Task Atualizar_dados_de_beneficiario_inativo_deve_devolver_200()
     {
         var beneficiario = (await fixture.SemearBeneficiariosAsync(
-            1, Planos.Bronze, "INATIVO", 500)).Single();
+            1, PlanosSeed.Bronze, "INATIVO", 500)).Single();
 
         var resposta = await Client.PutAsync($"/beneficiarios/{beneficiario.Id}", Http.Json(new
         {
             NomeCompleto = "Nome Corrigido do Inativo",
             DataNascimento = "1990-05-12",
-            PlanoId = Planos.Bronze,
+            PlanoId = PlanosSeed.Bronze,
             Status = "INATIVO"
         }));
 

@@ -1,7 +1,8 @@
 using System.Net;
 using System.Text.Json;
+using Desafio.Api.Tests.Integracao;
 
-namespace Desafio.Api.Tests;
+namespace Desafio.Api.Tests.Integracao.Planos;
 
 [Collection(ColecaoDaApi.Nome)]
 public class PlanosTests(ApiFixture fixture) : IAsyncLifetime
@@ -45,7 +46,7 @@ public class PlanosTests(ApiFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task Obter_deve_devolver_o_plano_do_seed()
     {
-        var resposta = await Client.GetAsync($"/planos/{Planos.Ouro}");
+        var resposta = await Client.GetAsync($"/planos/{PlanosSeed.Ouro}");
 
         Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
 
@@ -57,7 +58,7 @@ public class PlanosTests(ApiFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task Obter_plano_inexistente_deve_devolver_404()
     {
-        var resposta = await Client.GetAsync($"/planos/{Planos.Inexistente}");
+        var resposta = await Client.GetAsync($"/planos/{PlanosSeed.Inexistente}");
 
         Assert.Equal(HttpStatusCode.NotFound, resposta.StatusCode);
     }
