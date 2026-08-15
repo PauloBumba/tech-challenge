@@ -1,4 +1,4 @@
-using Desafio.Api.Dominio;
+using Desafio.Api.Dominio.Excecoes;
 
 namespace Desafio.Api.Api.Contratos;
 

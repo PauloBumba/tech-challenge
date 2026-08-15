@@ -1,6 +1,6 @@
-using Desafio.Api.Dominio;
+using Desafio.Api.Dominio.Entidades;
 
-namespace Desafio.Api.Api.Contratos;
+namespace Desafio.Api.Api.Contratos.Planos;
 
 public sealed record PlanoRequest(string? Nome, string? CodigoRegistroAns);
 

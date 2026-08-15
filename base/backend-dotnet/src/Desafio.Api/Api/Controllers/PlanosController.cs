@@ -1,8 +1,10 @@
 using Desafio.Api.Api.Contratos;
-using Desafio.Api.Aplicacao;
+using Desafio.Api.Api.Contratos.Planos;
+using Desafio.Api.Aplicacao.Contratos;
+using Desafio.Api.Aplicacao.Servicos;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Desafio.Api.Controllers;
+namespace Desafio.Api.Api.Controllers;
 
 [ApiController]
 [Route("planos")]

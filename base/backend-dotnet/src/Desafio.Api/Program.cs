@@ -1,7 +1,7 @@
 using Desafio.Api.Api.Contratos;
 using Desafio.Api.Api.Middlewares;
-using Desafio.Api.Aplicacao;
-using Desafio.Api.Dominio;
+using Desafio.Api.Aplicacao.Servicos;
+using Desafio.Api.Dominio.Excecoes;
 using Desafio.Api.Infraestrutura;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -17,6 +17,7 @@ builder.Services.AddDbContext<AppDbContext>(opcoes =>
     opcoes.UseNpgsql(builder.Configuration.GetConnectionString("Postgres")));
 
 builder.Services.AddScoped<PlanoServico>();
+builder.Services.AddScoped<BeneficiarioServico>();
 
 // A interface web roda em outra origem (porta 4200) e o navegador bloqueia a chamada sem isto.
 builder.Services.AddCors(opcoes => opcoes.AddPolicy(

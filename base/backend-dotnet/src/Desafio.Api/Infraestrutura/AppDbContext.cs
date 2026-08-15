@@ -1,4 +1,4 @@
-using Desafio.Api.Dominio;
+using Desafio.Api.Dominio.Entidades;
 using Microsoft.EntityFrameworkCore;
 
 namespace Desafio.Api.Infraestrutura;

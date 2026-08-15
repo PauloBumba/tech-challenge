@@ -2,7 +2,7 @@ using Desafio.Api.Infraestrutura;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
-namespace Desafio.Api.Controllers;
+namespace Desafio.Api.Api.Controllers;
 
 [ApiController]
 [Route("health")]

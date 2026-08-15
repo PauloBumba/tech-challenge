@@ -1,6 +1,6 @@
 using System.Text.Json;
 using Desafio.Api.Api.Contratos;
-using Desafio.Api.Dominio;
+using Desafio.Api.Dominio.Excecoes;
 
 namespace Desafio.Api.Api.Middlewares;
 

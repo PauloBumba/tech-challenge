@@ -1,6 +1,7 @@
 using System.Text.RegularExpressions;
+using Desafio.Api.Dominio.Excecoes;
 
-namespace Desafio.Api.Dominio;
+namespace Desafio.Api.Dominio.Entidades;
 
 public partial class Plano
 {

@@ -14,6 +14,8 @@ TestResults/
 # Ambiente
 .env
 .env.local
+.env.*
+!.env.example
 *.pfx
 
 # Editores

@@ -48,13 +48,17 @@ Os testes que você escrever para o que criar entram no mesmo projeto.
 
 ## Rodando fora do Docker
 
-Requer .NET SDK 10 e um PostgreSQL acessível. Ajuste `ConnectionStrings:Postgres` em
-`src/Desafio.Api/appsettings.json` ou exporte a variável de ambiente:
+Requer .NET SDK 10 e um PostgreSQL acessível. A conexão vem da variável de ambiente
+`ConnectionStrings__Postgres` (fonte da verdade); em desenvolvimento ela também pode ser
+configurada em `appsettings.Development.json`. Fora do Docker:
 
 ```bash
-export ConnectionStrings__Postgres="Host=localhost;Port=5432;Database=desafio;Username=desafio;Password=desafio"
+cp ../../.env.example .env
+set -a; source .env; set +a   # carrega ConnectionStrings__Postgres
 dotnet run --project src/Desafio.Api
 ```
+
+Para o `dotnet-ef` (migrations), a mesma variável é exigida — não há conexão hardcoded.
 
 ## Organização
 

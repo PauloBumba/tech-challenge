@@ -1,9 +1,11 @@
-using Desafio.Api.Dominio;
+using Desafio.Api.Aplicacao.Contratos;
+using Desafio.Api.Dominio.Entidades;
+using Desafio.Api.Dominio.Excecoes;
 using Desafio.Api.Infraestrutura;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
 
-namespace Desafio.Api.Aplicacao;
+namespace Desafio.Api.Aplicacao.Servicos;
 
 public class PlanoServico(AppDbContext db)
 {
@@ -93,5 +95,3 @@ public class PlanoServico(AppDbContext db)
         excecao.InnerException is PostgresException postgres &&
         postgres.SqlState == CodigoViolacaoDeUnicidade;
 }
-
-public sealed record PlanoRequestDados(string? Nome, string? CodigoRegistroAns);

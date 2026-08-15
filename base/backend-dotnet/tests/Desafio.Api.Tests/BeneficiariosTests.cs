@@ -54,6 +54,63 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
     }
 
+    [Fact]
+    public async Task Criar_deve_ignorar_id_status_e_data_cadastro_enviados_pelo_cliente()
+    {
+        var resposta = await Client.PostAsync("/beneficiarios", Http.Json(new
+        {
+            Id = Guid.NewGuid(),
+            NomeCompleto = "Maria Aparecida da Silva",
+            Cpf = "52998224725",
+            DataNascimento = "1990-05-12",
+            PlanoId = Planos.Bronze,
+            Status = "INATIVO",
+            DataCadastro = "2020-01-01T00:00:00Z"
+        }));
+
+        Assert.Equal(HttpStatusCode.Created, resposta.StatusCode);
+
+        var corpo = await resposta.CorpoAsync();
+        Assert.Equal("ATIVO", corpo.GetProperty("status").GetString());
+        Assert.NotEqual(Guid.Empty, corpo.GetProperty("id").GetGuid());
+        Assert.True(corpo.GetProperty("data_cadastro").GetDateTime() > new DateTime(2020, 1, 2));
+    }
+
+    [Fact]
+    public async Task Criar_com_nome_completo_ausente_deve_devolver_400()
+    {
+        var resposta = await Client.PostAsync("/beneficiarios", Http.Json(new
+        {
+            Cpf = "52998224725",
+            DataNascimento = "1990-05-12",
+            PlanoId = Planos.Bronze
+        }));
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Criar_com_cpf_fora_do_formato_deve_devolver_400()
+    {
+        var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("123")));
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Criar_com_data_de_nascimento_futura_deve_devolver_400()
+    {
+        var resposta = await Client.PostAsync("/beneficiarios", Http.Json(new
+        {
+            NomeCompleto = "Maria Aparecida da Silva",
+            Cpf = "52998224725",
+            DataNascimento = "2099-01-01",
+            PlanoId = Planos.Bronze
+        }));
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+    }
+
     // ------------------------------------------------------------------ consulta por id
 
     [Fact]

@@ -25,7 +25,7 @@ namespace Desafio.Api.Infraestrutura.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
-            modelBuilder.Entity("Desafio.Api.Dominio.Beneficiario", b =>
+            modelBuilder.Entity("Desafio.Api.Dominio.Entidades.Beneficiario", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -62,7 +62,7 @@ namespace Desafio.Api.Infraestrutura.Migrations
                     b.ToTable("Beneficiarios");
                 });
 
-            modelBuilder.Entity("Desafio.Api.Dominio.Plano", b =>
+            modelBuilder.Entity("Desafio.Api.Dominio.Entidades.Plano", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -92,9 +92,9 @@ namespace Desafio.Api.Infraestrutura.Migrations
                     b.ToTable("Planos");
                 });
 
-            modelBuilder.Entity("Desafio.Api.Dominio.Beneficiario", b =>
+            modelBuilder.Entity("Desafio.Api.Dominio.Entidades.Beneficiario", b =>
                 {
-                    b.HasOne("Desafio.Api.Dominio.Plano", "Plano")
+                    b.HasOne("Desafio.Api.Dominio.Entidades.Plano", "Plano")
                         .WithMany()
                         .HasForeignKey("PlanoId")
                         .OnDelete(DeleteBehavior.Restrict)
