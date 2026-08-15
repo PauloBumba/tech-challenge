@@ -98,3 +98,11 @@ Formato:
 - **Prompt que mais influenciou o resultado:** "10" — prosseguir com TASK-BEN-10
 - **Trecho não trivial gerado:** nenhum — apenas testes de validação
 - **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-INF-01]
+- **Nível de uso:** refatoração estrutural — subdivisão por tipo seguindo Clean Architecture
+- **Prompt que mais influenciou o resultado:** "sim" — usuário solicitou reorganização de Infraestrutura
+- **Trecho não trivial gerado:** nenhum — apenas criação de pastas e atualização de namespaces
+- **Ainda não explicaria com segurança:** não

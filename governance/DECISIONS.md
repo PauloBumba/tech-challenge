@@ -260,3 +260,14 @@ Formato:
   `ConflitoException`, `NaoEncontradoException`, `NaoProcessavelException`) e retorna resposta
   JSON estruturada; exceções não previstas resultam em 500 com `ErroInterno` sem vazar stack trace.
   Nenhuma mudança de código necessária, apenas validação por testes
+
+### [TASK-INF-01] Reorganização de Infraestrutura — subdivisão por tipo
+- **Situação:** refatoração estrutural — Clean Architecture exige subdivisão por tipo de artefato
+- **O que o padrão diz:** ADR-ARQ-01 estabelece que camadas devem ser subdivididas por tipo de
+  artefato (como TASK-ARCH-03 fez com Dominio e Aplicacao)
+- **Decisão:** camada `Infraestrutura` subdividida em `Persistence/` (AppDbContext, AppDbContextFactory,
+  CargaInicial, Migrations) e `Configuration/` (Dependencias). Namespaces atualizados em todos
+  os arquivos afetados (Dominio, Aplicacao, Api, Program.cs, Tests)
+- **Porquê:** segue o mesmo princípio de separação por tipo aplicado nas TASKs anteriores,
+  tornando a arquitetura mais consistente e organizada. Cada tipo de infraestrutura tem sua
+  própria pasta, facilitando manutenção e expansão futura

@@ -24,5 +24,6 @@ completo daquela mudança (testes rodados, evidência RED, arquivos alterados). 
 | TASK-BEN-08 | Validador de CPF completo: CpfValidator com algoritmo oficial (formato, dígitos verificadores, rejeição de sequências repetidas); 19 testes unitários + 2 de integração | 19b97d9 | 77/77 |
 | TASK-BEN-09 | Regras de exclusão lógica de planos: validação via query filter (já implementado); 2 testes de integração como evidência | ff0fb74 | 79/79 |
 | TASK-BEN-10 | Tratamento de erro centralizado: validação via middleware (já implementado); 4 testes de integração como evidência | 41faf44 | 79/79 |
+| TASK-INF-01 | Reorganização de Infraestrutura: subdivisão em Persistence/ e Configuration/; namespaces atualizados | bb384b4 | 79/79 |
 
 <!-- Nova linha a cada task concluída, ver POST_TASK_WORKFLOW.md item 4 -->

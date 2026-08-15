@@ -57,6 +57,12 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       `Aplicacao/Dependencias.cs`, `Infraestrutura/Dependencias.cs` criados; `Program.cs`
       enxugado; build 0 erros, suíte idêntica 49/54 (ver
       `ai-change-records/TASK-ARCH-05.md`).
+- [x] **TASK-INF-01** — Reorganizar camada de Infraestrutura seguindo Clean Architecture:
+      subdividir em `Persistence/` (AppDbContext, AppDbContextFactory, CargaInicial, Migrations)
+      e `Configuration/` (Dependencias). Atualizar namespaces e migrations. **Feito 2026-08-14**:
+      criadas subpastas `Persistence/` e `Configuration/`; arquivos movidos; namespaces
+      atualizados em todos os arquivos afetados; migrations atualizadas — 79/79 GREEN
+      (ver `ai-change-records/TASK-INF-01.md`).
 
 ## Fase 2 — Backend, módulo Beneficiários
 

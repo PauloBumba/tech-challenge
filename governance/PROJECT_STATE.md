@@ -4,7 +4,7 @@ Atualizar a cada commit (Seção 3 do `AGENTS.md`). Tamanho fixo — resumo, nã
 completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 
 **Última atualização:** 2026-08-14
-**Última TASK concluída:** TASK-BEN-10 (tratamento de erro centralizado — validação via middleware)
+**Última TASK concluída:** TASK-INF-01 (reorganização de Infraestrutura — subdivisão em Persistence e Configuration)
 **Testes:** `dotnet test` — **79/79 GREEN** (suíte inteira)
 
 ### Backend — `Desafio.Api`
@@ -24,6 +24,7 @@ completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 || Regras de exclusão lógica (plano/beneficiário) | a validar | validado (GREEN) | TASK-BEN-09 |
 || Tratamento de erro centralizado (400/404/409/422/500) | existe para Planos, a validar para Beneficiários | validado (GREEN) | TASK-BEN-10 |
 || Testes escritos para o que for implementado | — | pendente | (por task) |
+|| Infraestrutura organizada por tipo | misturada | subdividida (Persistence/Configuration) | TASK-INF-01 |
 
 | Item | Situação inicial | Situação atual | Task |
 | --- | --- | --- | --- |
