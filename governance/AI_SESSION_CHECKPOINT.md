@@ -4,13 +4,14 @@ Atualizar ao fim de cada sessão de trabalho (ou quando o contexto da IA for rei
 Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md`, Seção 8.
 
 **Data/sessão:** 2026-08-14
-**Última TASK concluída:** TASK-BEN-08 (validador de CPF completo — algoritmo oficial brasileiro)
-**Testes:** `dotnet test` — **77/77 GREEN** (suíte inteira)
+**Última TASK concluída:** TASK-BEN-09 (regras de exclusão lógica de planos — validação via query filter)
+**Testes:** `dotnet test` — **79/79 GREEN** (suíte inteira)
 
 ## Arquivos alterados nesta sessão
 
 - **Validador de CPF (TASK-BEN-08):** `Dominio/Validadores/CpfValidator.cs` (novo — algoritmo oficial de CPF), `Dominio/Entidades/Beneficiario.cs` (substituída validação simples por CpfValidator), `tests/Unitarios/Dominio/Validadores/CpfValidatorTests.cs` (novo — 19 testes), `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (2 testes novos)
-- **Governança:** `DECISIONS.md`, `AI_USAGE.md`, `AI_CHANGE_RECORD.md`, `TASKS.md`, `PROJECT_STATE.md`, `ai-change-records/TASK-BEN-08.md`
+- **Regras de exclusão lógica (TASK-BEN-09):** `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (2 testes de validação — funcionalidade já existia via query filter)
+- **Governança:** `DECISIONS.md`, `AI_USAGE.md`, `AI_CHANGE_RECORD.md`, `TASKS.md`, `PROJECT_STATE.md`, `ai-change-records/TASK-BEN-08.md`, `ai-change-records/TASK-BEN-09.md`
 - **Sessões anteriores:** `Infraestrutura/AppDbContext.cs` (`HasIndex(Cpf).IsUnique()`),
   `Infraestrutura/Migrations/` (IndiceUnicoCpfBeneficiario + snapshot),
   `tests/.../BeneficiariosTests.cs` (teste de concorrência: 2 POSTs paralelos → 201+409);
@@ -59,12 +60,12 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
 
 ## Próxima TASK
 
-- TASK-BEN-09 — validar que plano excluído logicamente conta como inexistente para novos
-  vínculos, mas não invalida vínculos existentes (SPEC 4.2).
+- TASK-BEN-10 — validar tratamento de erro centralizado (400/404/409/422/500) para Beneficiários,
+  seguindo o padrão de Planos.
 
 ## Bloqueios / dúvidas em aberto
 
-- Nenhum. Backend de Beneficiários inteiro GREEN (77/77).
+- Nenhum. Backend de Beneficiários inteiro GREEN (79/79).
 
 ## Decisões tomadas nesta sessão (resumo — detalhe fica em `DECISIONS.md`)
 
@@ -92,6 +93,8 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
 - TASK-BEN-08: validador de CPF completo via `CpfValidator` em `Dominio/Validadores/` com
   algoritmo oficial brasileiro (formato, dígitos verificadores, rejeição de sequências
   repetidas); 19 testes unitários + 2 de integração. Suíte 77/77.
+- TASK-BEN-09: regras de exclusão lógica de planos validadas via query filter (já
+  implementado); 2 testes de integração como evidência. Suíte 79/79.
 - TASK-ARCH-06: commit agora em Conventional Commits + `TASK: <ID>` (padrão da empresa).
 - ADR-ARQ-01: Clean Architecture em camadas, **não** Vertical Slice (código base já era em
   camadas; SPEC 8 cita Planos como padrão da casa).
