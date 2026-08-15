@@ -44,6 +44,10 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("71428793860")));
 
         Assert.Equal(HttpStatusCode.Conflict, resposta.StatusCode);
+
+        var corpo = await resposta.CorpoAsync();
+        Assert.Equal("Conflito", corpo.GetProperty("erro").GetString());
+        Assert.NotEmpty(corpo.GetProperty("detalhes").EnumerateArray());
     }
 
     [Fact]
@@ -70,6 +74,10 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
             Http.Json(CorpoDeCriacao("39053344705", PlanosSeed.Inexistente)));
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
+
+        var corpo = await resposta.CorpoAsync();
+        Assert.Equal("NaoProcessavel", corpo.GetProperty("erro").GetString());
+        Assert.NotEmpty(corpo.GetProperty("detalhes").EnumerateArray());
     }
 
     [Fact]
@@ -150,6 +158,10 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("123")));
 
         Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+
+        var corpo = await resposta.CorpoAsync();
+        Assert.Equal("ValidacaoInvalida", corpo.GetProperty("erro").GetString());
+        Assert.NotEmpty(corpo.GetProperty("detalhes").EnumerateArray());
     }
 
     [Fact]
@@ -158,6 +170,10 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("11111111111")));
 
         Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+
+        var corpo = await resposta.CorpoAsync();
+        Assert.Equal("ValidacaoInvalida", corpo.GetProperty("erro").GetString());
+        Assert.NotEmpty(corpo.GetProperty("detalhes").EnumerateArray());
     }
 
     [Fact]
@@ -205,6 +221,10 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
         var resposta = await Client.GetAsync($"/beneficiarios/{Guid.NewGuid()}");
 
         Assert.Equal(HttpStatusCode.NotFound, resposta.StatusCode);
+
+        var corpo = await resposta.CorpoAsync();
+        Assert.Equal("NaoEncontrado", corpo.GetProperty("erro").GetString());
+        // Detalhes pode ser vazio para NaoEncontrado
     }
 
     // ------------------------------------------------------------------ atualização
