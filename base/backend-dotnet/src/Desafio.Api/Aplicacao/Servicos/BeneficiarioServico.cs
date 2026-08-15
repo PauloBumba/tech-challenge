@@ -125,11 +125,18 @@ public class BeneficiarioServico(AppDbContext db)
             .Take(tamanho)
             .ToListAsync(cancellationToken);
 
-        // O plano é resolvido aqui, e não na consulta principal, porque o FindAsync usa o
-        // cache do contexto: a quantidade de idas ao banco não cresce com o tamanho da página.
+        // Os planos são resolvidos em uma única consulta IN — nunca uma por beneficiário
+        // (SPEC 3: a quantidade de consultas não pode crescer com o tamanho da página).
+        var idsDePlanos = lista.Select(b => b.PlanoId).Distinct().ToList();
+        var planos = await db.Planos
+            .AsNoTracking()
+            .Where(p => idsDePlanos.Contains(p.Id))
+            .ToDictionaryAsync(p => p.Id, cancellationToken);
+
         foreach (var b in lista)
         {
-            b.Plano = await db.Planos.FindAsync(b.PlanoId);
+            planos.TryGetValue(b.PlanoId, out var plano);
+            b.Plano = plano;
         }
 
         return new PaginaDeBeneficiarios(lista, pagina, tamanho, total);
