@@ -1,10 +1,10 @@
-using System.Text.RegularExpressions;
 using Desafio.Api.Dominio.Enums;
 using Desafio.Api.Dominio.Excecoes;
+using Desafio.Api.Dominio.Validadores;
 
 namespace Desafio.Api.Dominio.Entidades;
 
-public partial class Beneficiario
+public class Beneficiario
 {
     private Beneficiario()
     {
@@ -65,7 +65,7 @@ public partial class Beneficiario
         {
             detalhes.Add(new DetalheErro("cpf", "obrigatorio"));
         }
-        else if (!FormatoDoCpf().IsMatch(cpf))
+        else if (!CpfValidator.Validar(cpf))
         {
             detalhes.Add(new DetalheErro("cpf", "formato_invalido"));
         }
@@ -154,7 +154,4 @@ public partial class Beneficiario
     }
 
     public void Excluir() => ExcluidoEm = DateTime.UtcNow;
-
-    [GeneratedRegex("^[0-9]{11}$")]
-    private static partial Regex FormatoDoCpf();
 }

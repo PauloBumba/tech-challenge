@@ -47,6 +47,22 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Criar_com_mesmo_cpf_simultaneamente_so_deve_aceitar_um()
+    {
+        var corpo = Http.Json(CorpoDeCriacao("52998224725"));
+
+        var respostas = await Task.WhenAll(
+            Client.PostAsync("/beneficiarios", corpo),
+            Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("52998224725"))));
+
+        var codigos = respostas.Select(r => r.StatusCode).Order().ToList();
+
+        Assert.Equal(
+            new[] { HttpStatusCode.Created, HttpStatusCode.Conflict },
+            codigos);
+    }
+
+    [Fact]
     public async Task Criar_com_plano_inexistente_deve_devolver_422()
     {
         var resposta = await Client.PostAsync(
@@ -95,6 +111,22 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     public async Task Criar_com_cpf_fora_do_formato_deve_devolver_400()
     {
         var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("123")));
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Criar_com_cpf_com_sequencia_repetida_deve_devolver_400()
+    {
+        var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("11111111111")));
+
+        Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Criar_com_cpf_com_digitos_verificadores_invalidos_deve_devolver_400()
+    {
+        var resposta = await Client.PostAsync("/beneficiarios", Http.Json(CorpoDeCriacao("52998224720")));
 
         Assert.Equal(HttpStatusCode.BadRequest, resposta.StatusCode);
     }
