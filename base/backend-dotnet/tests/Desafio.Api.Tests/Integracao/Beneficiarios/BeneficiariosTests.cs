@@ -73,6 +73,43 @@ public class BeneficiariosTests(ApiFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task Criar_com_plano_excluido_logicamente_deve_devolver_422()
+    {
+        // 1. Excluir um plano existente
+        await Client.DeleteAsync($"/planos/{PlanosSeed.Bronze}");
+
+        // 2. Tentar criar beneficiário com o plano excluído
+        var resposta = await Client.PostAsync(
+            "/beneficiarios",
+            Http.Json(CorpoDeCriacao("39053344705", PlanosSeed.Bronze)));
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, resposta.StatusCode);
+    }
+
+    [Fact]
+    public async Task Beneficiario_existente_deve_permanecer_vinculado_ao_plano_excluido()
+    {
+        // 1. Criar beneficiário com plano válido
+        var respostaCriacao = await Client.PostAsync(
+            "/beneficiarios",
+            Http.Json(CorpoDeCriacao("39053344705", PlanosSeed.Bronze)));
+
+        var corpoCriacao = await respostaCriacao.CorpoAsync();
+        var beneficiarioId = corpoCriacao.GetProperty("id").GetGuid();
+
+        // 2. Excluir o plano
+        await Client.DeleteAsync($"/planos/{PlanosSeed.Bronze}");
+
+        // 3. Beneficiário ainda deve ser acessível e manter o vínculo
+        var respostaObter = await Client.GetAsync($"/beneficiarios/{beneficiarioId}");
+
+        Assert.Equal(HttpStatusCode.OK, respostaObter.StatusCode);
+
+        var corpoObter = await respostaObter.CorpoAsync();
+        Assert.Equal(PlanosSeed.Bronze, corpoObter.GetProperty("plano_id").GetGuid());
+    }
+
+    [Fact]
     public async Task Criar_deve_ignorar_id_status_e_data_cadastro_enviados_pelo_cliente()
     {
         var resposta = await Client.PostAsync("/beneficiarios", Http.Json(new
