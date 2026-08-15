@@ -73,6 +73,14 @@ public class BeneficiarioServico(AppDbContext db)
         return beneficiario;
     }
 
+    public async Task ExcluirAsync(Guid id, CancellationToken cancellationToken)
+    {
+        var beneficiario = await ObterAsync(id, cancellationToken);
+
+        beneficiario.Excluir();
+        await SalvarAsync(cancellationToken);
+    }
+
     public async Task<PaginaDeBeneficiarios> ListarAsync(
         BeneficiarioFiltro filtro,
         CancellationToken cancellationToken)
@@ -129,9 +137,12 @@ public class BeneficiarioServico(AppDbContext db)
 
     // A verificação abaixo não elimina a corrida entre duas requisições simultâneas.
     // A garantia real é o índice único no banco; aqui a violação vira 409.
+    // O CPF de um beneficiário excluído continua ocupado (SPEC 2.3), por isso a verificação
+    // ignora o filtro de consulta que esconde registros logicamente excluídos.
     private async Task GarantirCpfUnicoAsync(string cpf, CancellationToken cancellationToken)
     {
         var conflito = await db.Beneficiarios
+            .IgnoreQueryFilters()
             .AsNoTracking()
             .Where(b => b.Cpf == cpf)
             .FirstOrDefaultAsync(cancellationToken);

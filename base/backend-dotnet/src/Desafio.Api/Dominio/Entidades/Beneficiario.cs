@@ -39,6 +39,8 @@ public partial class Beneficiario
 
     public DateTime DataCadastro { get; private set; }
 
+    public DateTime? ExcluidoEm { get; private set; }
+
     public void DefinirDados(
         string? nomeCompleto,
         string? cpf,
@@ -150,6 +152,8 @@ public partial class Beneficiario
         PlanoId = planoId.Value;
         Status = status;
     }
+
+    public void Excluir() => ExcluidoEm = DateTime.UtcNow;
 
     [GeneratedRegex("^[0-9]{11}$")]
     private static partial Regex FormatoDoCpf();
