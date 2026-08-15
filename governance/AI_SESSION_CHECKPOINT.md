@@ -4,7 +4,7 @@ Atualizar ao fim de cada sessão de trabalho (ou quando o contexto da IA for rei
 Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md`, Seção 8.
 
 **Data/sessão:** 2026-08-14
-**Última TASK concluída:** TASK-BEN-10 (tratamento de erro centralizado — validação via middleware)
+**Última TASK concluída:** TASK-INF-01 (reorganização de Infraestrutura — subdivisão em Persistence e Configuration)
 **Testes:** `dotnet test` — **79/79 GREEN** (suíte inteira)
 
 ## Arquivos alterados nesta sessão
@@ -12,7 +12,8 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
 - **Validador de CPF (TASK-BEN-08):** `Dominio/Validadores/CpfValidator.cs` (novo — algoritmo oficial de CPF), `Dominio/Entidades/Beneficiario.cs` (substituída validação simples por CpfValidator), `tests/Unitarios/Dominio/Validadores/CpfValidatorTests.cs` (novo — 19 testes), `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (2 testes novos)
 - **Regras de exclusão lógica (TASK-BEN-09):** `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (2 testes de validação — funcionalidade já existia via query filter)
 - **Tratamento de erro centralizado (TASK-BEN-10):** `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (4 testes de validação — funcionalidade já existia via middleware)
-- **Governança:** `DECISIONS.md`, `AI_USAGE.md`, `AI_CHANGE_RECORD.md`, `TASKS.md`, `PROJECT_STATE.md`, `ai-change-records/TASK-BEN-08.md`, `ai-change-records/TASK-BEN-09.md`, `ai-change-records/TASK-BEN-10.md`
+- **Reorganização de Infraestrutura (TASK-INF-01):** `Infraestrutura/Persistence/` (nova — AppDbContext, AppDbContextFactory, CargaInicial, Migrations), `Infraestrutura/Configuration/` (nova — Dependencias); namespaces atualizados em Aplicacao/Servicos, Api/Controllers, Program.cs, Tests/Integracao, Migrations
+- **Governança:** `DECISIONS.md`, `AI_USAGE.md`, `AI_CHANGE_RECORD.md`, `TASKS.md`, `PROJECT_STATE.md`, `ai-change-records/TASK-BEN-08.md`, `ai-change-records/TASK-BEN-09.md`, `ai-change-records/TASK-BEN-10.md`, `ai-change-records/TASK-INF-01.md`
 - **Sessões anteriores:** `Infraestrutura/AppDbContext.cs` (`HasIndex(Cpf).IsUnique()`),
   `Infraestrutura/Migrations/` (IndiceUnicoCpfBeneficiario + snapshot),
   `tests/.../BeneficiariosTests.cs` (teste de concorrência: 2 POSTs paralelos → 201+409);
@@ -61,7 +62,7 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
 
 ## Próxima TASK
 
-- Backend de Beneficiários está completo. Próxima fase: Frontend (TASK-FE-01 a TASK-FE-04).
+- Backend de Beneficiários está completo. Infraestrutura reorganizada. Próxima fase: Frontend (TASK-FE-01 a TASK-FE-04).
 
 ## Bloqueios / dúvidas em aberto
 
@@ -97,6 +98,8 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
   implementado); 2 testes de integração como evidência. Suíte 79/79.
 - TASK-BEN-10: tratamento de erro centralizado validado via middleware (já implementado);
   4 testes de integração como evidência. Suíte 79/79.
+- TASK-INF-01: Infraestrutura subdividida em Persistence/ e Configuration/ seguindo Clean
+  Architecture; namespaces atualizados em todos os arquivos afetados. Suíte 79/79.
 - TASK-ARCH-06: commit agora em Conventional Commits + `TASK: <ID>` (padrão da empresa).
 - ADR-ARQ-01: Clean Architecture em camadas, **não** Vertical Slice (código base já era em
   camadas; SPEC 8 cita Planos como padrão da casa).
