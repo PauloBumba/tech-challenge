@@ -227,3 +227,20 @@ Formato:
   completa, e o algoritmo oficial é o que a Receita Federal usa — garante que CPFs com dígitos
   verificadores inválidos ou sequências repetidas sejam rejeitados. Segue Clean Architecture:
   validador no domínio, testes unitários + integração
+
+### [TASK-BEN-09] Regras de exclusão lógica de planos — já implementada via query filter
+- **Situação:** validação de funcionalidade existente — SPEC 4.2 descreve o comportamento de
+  exclusão lógica de planos e vínculos com beneficiários
+- **O que a spec diz:** SPEC 4.2 — "Plano excluído logicamente conta como inexistente para
+  novos vínculos; não pode ser referenciado por novos beneficiários nem por atualizações.
+  Beneficiários que já apontavam para o plano no momento da exclusão continuam válidos e
+  permanecem vinculados a ele"
+- **Decisão:** funcionalidade já estava implementada corretamente via query filter em
+  `AppDbContext` (`HasQueryFilter(p => p.ExcluidoEm == null)` em Planos). Adicionados testes
+  de integração como evidência: plano excluído → 422 para novos vínculos, beneficiários
+  existentes continuam acessíveis e mantêm o vínculo
+- **Porquê:** o query filter do EF Core já garante o comportamento descrito na SPEC: planos
+  excluídos não aparecem em consultas normais (`GarantirPlanoExisteAsync` usa `db.Planos`
+  e respeita o filter), mas beneficiários não têm filter dependente de Plano, então continuam
+  acessíveis mesmo quando o plano é excluído. Nenhuma mudança de código necessária, apenas
+  validação por testes

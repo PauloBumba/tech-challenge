@@ -98,8 +98,10 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       de sequências repetidas. **Feito 2026-08-14**: `CpfValidator` em `Dominio/Validadores/` com
       algoritmo oficial do CPF brasileiro; integrado na entidade `Beneficiario`; 19 testes
       unitários + 2 de integração — 77/77 GREEN (ver `ai-change-records/TASK-BEN-08.md`).
-- [ ] **TASK-BEN-09** — Confirmar que plano excluído logicamente conta como inexistente para
-      novos vínculos, mas não invalida vínculos existentes (SPEC 4.2).
+- [x] **TASK-BEN-09** — Confirmar que plano excluído logicamente conta como inexistente para
+      novos vínculos, mas não invalida vínculos existentes (SPEC 4.2). **Feito 2026-08-14**:
+      funcionalidade já implementada via query filter em `AppDbContext`; adicionados 2 testes
+      de integração como evidência — 79/79 GREEN (ver `ai-change-records/TASK-BEN-09.md`).
 
 ## Fase 3 — Frontend, módulo Beneficiários
 
