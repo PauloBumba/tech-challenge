@@ -30,5 +30,7 @@ completo daquela mudança (testes rodados, evidência RED, arquivos alterados). 
 | TASK-FE-03 | Frontend — erros da API (400/409/422) viram mensagem na tela via mensagemDeErro | 1363b2e | build Angular GREEN |
 | TASK-FE-04 | Frontend — loading/lista vazia; exclusão só some após sucesso do DELETE | 1363b2e | build Angular GREEN |
 | TASK-ARCH-07 | Inversão de dependência da Aplicação: interfaces de repositório em Aplicacao/Repositorios, implementações em Infraestrutura/Persistence/Repositorios; serviços sem EF/Npgsql; Fluent API extraída para IEntityTypeConfiguration por entidade; teste de dependência RED→GREEN | abeb172 | 80/80 |
+| TASK-FE-05 | Frontend — polish de CSS: badges de status, hover/focus, campo inválido, CSS morto removido; sem biblioteca de componentes (SPEC 9 não pontua design) | — | build Angular GREEN |
+| TASK-FE-06 | Frontend — infra E2E (Playwright): smoke test do fluxo da entrevista; revelou e corrigiu bug NG0203 (takeUntilDestroyed sem DestroyRef em handler) | — | npm run e2e GREEN |
 
 <!-- Nova linha a cada task concluída, ver POST_TASK_WORKFLOW.md item 4 -->

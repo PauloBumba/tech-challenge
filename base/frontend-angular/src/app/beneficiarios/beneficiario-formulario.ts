@@ -1,6 +1,7 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import {
   Component,
+  DestroyRef,
   EventEmitter,
   Input,
   OnInit,
@@ -36,6 +37,7 @@ import { apenasDigitos, cpfValido, formatarCpf } from './cpf';
 })
 export class BeneficiarioFormulario implements OnInit {
   private readonly servico = inject(BeneficiarioServico);
+  private readonly destroyRef = inject(DestroyRef);
 
   // null = cadastro; preenchido = edição (CPF vira somente leitura).
   @Input() beneficiario: Beneficiario | null = null;
@@ -104,7 +106,7 @@ export class BeneficiarioFormulario implements OnInit {
     this.enviando.set(true);
     this.erro.set(null);
 
-    resultado.pipe(takeUntilDestroyed()).subscribe({
+    resultado.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.salvo.emit(),
       error: (resposta: HttpErrorResponse) => {
         this.erro.set(mensagemDeErro(resposta));

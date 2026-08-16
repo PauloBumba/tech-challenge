@@ -133,3 +133,28 @@ Formato:
   `beneficiario-formulario.ts` — validators customizados (`cpfFormatoValido`, `dataNoPassado`)
   em reactive forms
 - **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-FE-05] Polish de CSS (visual coerente sem mudar comportamento)
+- **Nível de uso:** IA como par — pedido explícito do Paulo ("dar um design na interface,
+  ux/ui"); a IA poliu reutilizando a paleta existente (azul #1d4ed8, vermelho #b42318), sem
+  introduzir biblioteca de componentes
+- **Prompt que mais influenciou o resultado:** "qual pira de dar o design na interface, ux/ui"
+- **Trecho não trivial gerado:** badges de status com classes `status ATIVO/INATIVO` e campo
+  inválido com `[class.invalido]` — CSS puro, sem lógica nova de componente
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-FE-06] Infra E2E com Playwright (revelou e corrigiu bug NG0203)
+- **Nível de uso:** IA como par — pedido do Paulo para ter E2E no frontend; a infra Playwright
+  foi montada e o smoke test do fluxo da entrevista foi escrito pela IA
+- **Prompt que mais influenciou o resultado:** "implementar E2E" (opção escolhida no questionário)
+- **Trecho não trivial gerado:** o **diagnóstico do NG0203** — `takeUntilDestroyed()` sem
+  `DestroyRef` chamado em handler de clique lança `inject()` fora de injection context e faz o
+  cadastro/edição/exclusão nunca acontecerem no navegador real (o build verde não pegava isso);
+  correção: `inject(DestroyRef)` + `takeUntilDestroyed(this.destroyRef)` nos 3 componentes. E o
+  gerador de CPF aleatório válido no spec (mesmo algoritmo do `CpfValidator`, para não colidir
+  com CPF de excluído logicamente que continua ocupado — TASK-BEN-05)
+- **Ainda não explicaria com segurança:** não

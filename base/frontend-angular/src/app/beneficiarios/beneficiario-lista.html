@@ -69,7 +69,9 @@
             <td>{{ beneficiario.nome_completo }}</td>
             <td>{{ formatarCpf(beneficiario.cpf) }}</td>
             <td>{{ beneficiario.data_nascimento }}</td>
-            <td>{{ beneficiario.status }}</td>
+            <td>
+              <span class="status" [class]="'status ' + beneficiario.status">{{ beneficiario.status }}</span>
+            </td>
             <td>{{ nomeDoPlano(beneficiario.plano_id) }}</td>
             <td class="coluna-acoes">
               <button type="button" class="botao" (click)="abrirEdicao(beneficiario)">Editar</button>

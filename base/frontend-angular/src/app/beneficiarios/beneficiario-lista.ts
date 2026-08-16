@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { mensagemDeErro } from '../nucleo/api';
@@ -25,6 +25,7 @@ import { formatarCpf } from './cpf';
 export class BeneficiarioLista {
   private readonly servico = inject(BeneficiarioServico);
   private readonly planoServico = inject(PlanoServico);
+  private readonly destroyRef = inject(DestroyRef);
 
   protected readonly beneficiarios = signal<Beneficiario[]>([]);
   protected readonly planos = signal<Plano[]>([]);
@@ -47,7 +48,7 @@ export class BeneficiarioLista {
   }
 
   private carregarPlanos(): void {
-    this.planoServico.listar().pipe(takeUntilDestroyed()).subscribe({
+    this.planoServico.listar().pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: (planos) => this.planos.set(planos)
     });
   }
@@ -63,7 +64,7 @@ export class BeneficiarioLista {
         status: this.filtroStatus(),
         planoId: this.filtroPlanoId()
       })
-      .pipe(takeUntilDestroyed())
+      .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next: (resultado) => {
           this.beneficiarios.set(resultado.dados);
@@ -132,7 +133,7 @@ export class BeneficiarioLista {
       return;
     }
 
-    this.servico.excluir(beneficiario.id).pipe(takeUntilDestroyed()).subscribe({
+    this.servico.excluir(beneficiario.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
       next: () => this.carregar(),
       error: (resposta: HttpErrorResponse) => {
         this.erro.set(mensagemDeErro(resposta));

@@ -3,12 +3,20 @@
 Atualizar ao fim de cada sessão de trabalho (ou quando o contexto da IA for reiniciado).
 Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md`, Seção 8.
 
-**Data/sessão:** 2026-08-15
-**Última TASK concluída:** TASK-ARCH-07 (inversão de dependência da Aplicação — repositórios)
-**Testes:** backend `dotnet test` — **80/80 GREEN** (suíte inteira); frontend `npm run build` — GREEN
+**Data/sessão:** 2026-08-16
+**Última TASK concluída:** TASK-FE-06 (infra E2E do frontend com Playwright — corrigiu bug NG0203)
+**Testes:** backend `dotnet test` — **80/80 GREEN** (suíte inteira); frontend `npm run build` GREEN + `npm run e2e` GREEN
 
 ## Arquivos alterados nesta sessão
 
+- **Polish de CSS (TASK-FE-05):** `app.css`, `beneficiario-lista.css|html`,
+  `beneficiario-formulario.css|html`, `planos-lista.css|html` — badges de status, hover/focus,
+  campo inválido, CSS morto removido; sem biblioteca de componentes (SPEC 9 não pontua design)
+- **Infra E2E (TASK-FE-06):** `package.json` (+`@playwright/test`, script `e2e`),
+  `playwright.config.ts`, `e2e/beneficiarios.spec.ts`, `.gitignore`; **corrigiu bug NG0203** —
+  `takeUntilDestroyed()` sem `DestroyRef` em handler de clique quebrava cadastro/edição/exclusão
+  no navegador (injetado `DestroyRef` em `beneficiario-lista`, `beneficiario-formulario`,
+  `planos-lista`)
 - **Frontend — Beneficiários (TASK-FE-01 a TASK-FE-04):** `src/app/beneficiarios/` (novo —
   `beneficiario.ts` modelos, `beneficiario-servico.ts`, `beneficiario-lista.ts|html|css`,
   `beneficiario-formulario.ts|html|css`, `cpf.ts`), `src/app/app.ts` e `src/app/app.html`
@@ -77,9 +85,10 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
 
 ## Próxima TASK
 
-- Frontend de Beneficiários completo (FE-01 a FE-04 GREEN). Backend com TASK-ARCH-07 GREEN
-  (repositórios, 80/80). Próxima: **Fase 4 — Entrega** (TASK-ENT-01 a TASK-ENT-04): imagens
-  multi-arch, `participantes/paulobumba/`, `./verificar.sh` e README de entrega.
+- Frontend completo (FE-01 a FE-06 GREEN: módulo Beneficiários + polish CSS + E2E Playwright que
+  corrigiu NG0203). Backend 80/80 (ARCH-07 commitado em abeb172). Próxima: **Fase 4 — Entrega**
+  (TASK-ENT-01 a TASK-ENT-04): imagens multi-arch, `participantes/paulobumba/`, `./verificar.sh`
+  e README de entrega.
 
 ## Bloqueios / dúvidas em aberto
 

@@ -3,9 +3,9 @@
 Atualizar a cada commit (Seção 3 do `AGENTS.md`). Tamanho fixo — resumo, não histórico
 completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 
-**Última atualização:** 2026-08-15
-**Última TASK concluída:** TASK-ARCH-07 (inversão de dependência da Aplicação — repositórios)
-**Testes:** `dotnet test` — **80/80 GREEN** (suíte inteira)
+**Última atualização:** 2026-08-16
+**Última TASK concluída:** TASK-FE-06 (infra E2E do frontend com Playwright — corrigiu bug NG0203)
+**Testes:** `dotnet test` — **80/80 GREEN**; frontend `npm run build` GREEN + `npm run e2e` GREEN
 
 ### Backend — `Desafio.Api`
 
@@ -34,6 +34,8 @@ completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 | Formulário de cadastro/edição de Beneficiários | faltando | pronto (reactive forms, validação client-side, CPF não editável na edição) | TASK-FE-02 |
 | Tratamento de erro da API na UI (400/409/422) | faltando | pronto (mensagemDeErro na tela, sem console.log) | TASK-FE-03 |
 | Estados de loading / lista vazia | faltando | pronto (loading/erro/vazio; exclusão só some após sucesso do DELETE) | TASK-FE-04 |
+| Visual (CSS) | cru | polido (badges de status, hover/focus, campo inválido; sem biblioteca — SPEC 9 não pontua design) | TASK-FE-05 |
+| Teste E2E do frontend (navegador) | faltando | pronto (Playwright, smoke do fluxo da entrevista); revelou e corrigiu NG0203 | TASK-FE-06 |
 
 ### Entrega
 

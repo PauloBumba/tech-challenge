@@ -76,6 +76,9 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       interfaces + implementações criadas, serviços reescritos, Fluent API extraída para
       `IEntityTypeConfiguration` por entidade, teste de dependência RED→GREEN — 80/80
       (ver `ai-change-records/TASK-ARCH-07.md`).
+- [ ] **TASK-OBS-01** — Observabilidade: endpoint `GET /metrics` em formato Prometheus com
+      contagem/duração de requisições por rota+status (via `System.Diagnostics.Metrics`,
+      sem dependência externa) e log estruturado de requisição (SPEC §7) sem interpolação.
 
 ## Fase 2 — Backend, módulo Beneficiários
 
@@ -150,6 +153,17 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       vazia no template; `excluir()` remove a linha só no `next` do DELETE (no `error` o item
       continua e a mensagem da API aparece); `confirm()` antes de excluir (ver
       `ai-change-records/TASK-FE-04.md`).
+- [x] **TASK-FE-05** — Polir o visual (CSS) mantendo a paleta e o comportamento: cards com
+      sombra, badges de status (ATIVO/INATIVO), hover/focus em botões e linhas, campo inválido
+      com borda vermelha, aviso de erro com fundo. **Feito 2026-08-16**: CSS de `app`,
+      `beneficiario-lista`, `beneficiario-formulario` e `planos-lista` alinhados; CSS morto
+      (`.cartao.pendente`) removido; build Angular 20 GREEN.
+- [x] **TASK-FE-06** — Infraestrutura E2E do frontend (prometida em `E2E/README.md`): Playwright
+      com smoke test do fluxo da entrevista (SPEC 9.7) — cadastro, CPF duplicado → mensagem,
+      filtro, edição (CPF travado), exclusão. **Feito 2026-08-16**: `@playwright/test` +
+      `e2e/beneficiarios.spec.ts`; revelou e corrigiu bug real **NG0203** (`takeUntilDestroyed()`
+      sem `DestroyRef` em handler de clique — quebrava cadastro/edição/exclusão no navegador);
+      suíte `npm run e2e` GREEN contra `docker compose up`.
 
 ## Fase 4 — Entrega
 

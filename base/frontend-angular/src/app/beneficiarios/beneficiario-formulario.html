@@ -11,7 +11,10 @@
   }
 
   <div class="campos">
-    <label class="campo">
+    <label
+      class="campo"
+      [class.invalido]="formulario.controls.nome_completo.invalid && formulario.controls.nome_completo.touched"
+    >
       <span>Nome completo</span>
       <input
         formControlName="nome_completo"
@@ -24,7 +27,10 @@
       }
     </label>
 
-    <label class="campo">
+    <label
+      class="campo"
+      [class.invalido]="formulario.controls.cpf.invalid && formulario.controls.cpf.touched"
+    >
       <span>CPF</span>
       <input formControlName="cpf" type="text" inputmode="numeric" maxlength="14" placeholder="000.000.000-00" />
       @if (formulario.controls.cpf.invalid && formulario.controls.cpf.touched) {
@@ -35,7 +41,10 @@
       }
     </label>
 
-    <label class="campo">
+    <label
+      class="campo"
+      [class.invalido]="formulario.controls.data_nascimento.invalid && formulario.controls.data_nascimento.touched"
+    >
       <span>Data de nascimento</span>
       <input formControlName="data_nascimento" type="date" />
       @if (formulario.controls.data_nascimento.invalid && formulario.controls.data_nascimento.touched) {
@@ -43,7 +52,10 @@
       }
     </label>
 
-    <label class="campo">
+    <label
+      class="campo"
+      [class.invalido]="formulario.controls.plano_id.invalid && formulario.controls.plano_id.touched"
+    >
       <span>Plano</span>
       <select formControlName="plano_id">
         <option value="" disabled>Selecione um plano</option>
