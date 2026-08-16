@@ -1,16 +1,15 @@
 using Desafio.Api.Aplicacao.Contratos;
+using Desafio.Api.Aplicacao.Repositorios;
 using Desafio.Api.Dominio.Entidades;
 using Desafio.Api.Dominio.Enums;
 using Desafio.Api.Dominio.Excecoes;
-using Desafio.Api.Infraestrutura.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace Desafio.Api.Aplicacao.Servicos;
 
-public class BeneficiarioServico(AppDbContext db)
+public class BeneficiarioServico(
+    IBeneficiarioRepositorio beneficiarios,
+    IPlanoRepositorio planos)
 {
-    private const string CodigoViolacaoDeUnicidade = "23505";
     private const int TamanhoMaximoDePagina = 100;
 
     // Default de tamanho segue o teste público (D19), não os 10 da spec: a suíte verde
@@ -29,19 +28,17 @@ public class BeneficiarioServico(AppDbContext db)
         await GarantirPlanoExisteAsync(beneficiario.PlanoId, cancellationToken);
         await GarantirCpfUnicoAsync(beneficiario.Cpf, cancellationToken);
 
-        db.Beneficiarios.Add(beneficiario);
-        await SalvarAsync(cancellationToken);
+        await beneficiarios.AdicionarAsync(beneficiario, cancellationToken);
+        await beneficiarios.SalvarAsync(cancellationToken);
 
         return beneficiario;
     }
 
     // Sem AsNoTracking de propósito, como PlanoServico.ObterAsync: o registro retornado aqui
     // é usado também por AtualizarAsync, que precisa de entidade rastreada para persistir.
-    public async Task<Beneficiario> ObterAsync(Guid id, CancellationToken cancellationToken)
-    {
-        return await db.Beneficiarios.FirstOrDefaultAsync(b => b.Id == id, cancellationToken)
-               ?? throw new NaoEncontradoException("Beneficiário não encontrado");
-    }
+    public async Task<Beneficiario> ObterAsync(Guid id, CancellationToken cancellationToken) =>
+        await beneficiarios.ObterPorIdAsync(id, cancellationToken)
+        ?? throw new NaoEncontradoException("Beneficiário não encontrado");
 
     public async Task<Beneficiario> AtualizarAsync(
         Guid id,
@@ -68,7 +65,7 @@ public class BeneficiarioServico(AppDbContext db)
             dados.PlanoId,
             dados.Status.Value);
 
-        await SalvarAsync(cancellationToken);
+        await beneficiarios.SalvarAsync(cancellationToken);
 
         return beneficiario;
     }
@@ -78,7 +75,7 @@ public class BeneficiarioServico(AppDbContext db)
         var beneficiario = await ObterAsync(id, cancellationToken);
 
         beneficiario.Excluir();
-        await SalvarAsync(cancellationToken);
+        await beneficiarios.SalvarAsync(cancellationToken);
     }
 
     public async Task<PaginaDeBeneficiarios> ListarAsync(
@@ -102,57 +99,16 @@ public class BeneficiarioServico(AppDbContext db)
                 [new DetalheErro("tamanho", "fora_do_intervalo")]);
         }
 
-        var consulta = db.Beneficiarios.AsNoTracking();
-
-        if (filtro.Status is not null)
-        {
-            consulta = consulta.Where(b => b.Status == filtro.Status);
-        }
-
-        if (filtro.PlanoId is not null)
-        {
-            consulta = consulta.Where(b => b.PlanoId == filtro.PlanoId);
-        }
-
-        var total = await consulta.CountAsync(cancellationToken);
-
-        // data_cadastro + id como desempate garantem paginação estável (DECISIONS.md):
-        // percorrer todas as páginas nunca repete nem perde registro.
-        var lista = await consulta
-            .OrderBy(b => b.DataCadastro)
-            .ThenBy(b => b.Id)
-            .Skip((pagina - 1) * tamanho)
-            .Take(tamanho)
-            .ToListAsync(cancellationToken);
-
-        // Os planos são resolvidos em uma única consulta IN — nunca uma por beneficiário
-        // (SPEC 3: a quantidade de consultas não pode crescer com o tamanho da página).
-        var idsDePlanos = lista.Select(b => b.PlanoId).Distinct().ToList();
-        var planos = await db.Planos
-            .AsNoTracking()
-            .Where(p => idsDePlanos.Contains(p.Id))
-            .ToDictionaryAsync(p => p.Id, cancellationToken);
-
-        foreach (var b in lista)
-        {
-            planos.TryGetValue(b.PlanoId, out var plano);
-            b.Plano = plano;
-        }
-
-        return new PaginaDeBeneficiarios(lista, pagina, tamanho, total);
+        return await beneficiarios.ListarAsync(filtro, pagina, tamanho, cancellationToken);
     }
 
     // A verificação abaixo não elimina a corrida entre duas requisições simultâneas.
-    // A garantia real é o índice único no banco; aqui a violação vira 409.
-    // O CPF de um beneficiário excluído continua ocupado (SPEC 2.3), por isso a verificação
-    // ignora o filtro de consulta que esconde registros logicamente excluídos.
+    // A garantia real é o índice único no banco; aqui a violação vira 409 (no SalvarAsync
+    // do repositório). O CPF de um beneficiário excluído continua ocupado (SPEC 2.3), por
+    // isso a consulta vem do repositório, que ignora o filtro de exclusão lógica.
     private async Task GarantirCpfUnicoAsync(string cpf, CancellationToken cancellationToken)
     {
-        var conflito = await db.Beneficiarios
-            .IgnoreQueryFilters()
-            .AsNoTracking()
-            .Where(b => b.Cpf == cpf)
-            .FirstOrDefaultAsync(cancellationToken);
+        var conflito = await beneficiarios.ObterPorCpfIncluindoExcluidosAsync(cpf, cancellationToken);
 
         if (conflito is null)
         {
@@ -169,11 +125,7 @@ public class BeneficiarioServico(AppDbContext db)
     // logicamente excluídos, então eles contam como inexistentes (SPEC 4.2).
     private async Task GarantirPlanoExisteAsync(Guid planoId, CancellationToken cancellationToken)
     {
-        var planoExiste = await db.Planos
-            .AsNoTracking()
-            .AnyAsync(p => p.Id == planoId, cancellationToken);
-
-        if (planoExiste)
+        if (await planos.ExistePorIdAsync(planoId, cancellationToken))
         {
             return;
         }
@@ -182,20 +134,4 @@ public class BeneficiarioServico(AppDbContext db)
             "Plano não encontrado",
             [new DetalheErro("plano_id", "inexistente")]);
     }
-
-    private async Task SalvarAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await db.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException excecao) when (EhViolacaoDeUnicidade(excecao))
-        {
-            throw new ConflitoException("Já existe beneficiário cadastrado com esse CPF");
-        }
-    }
-
-    private static bool EhViolacaoDeUnicidade(DbUpdateException excecao) =>
-        excecao.InnerException is PostgresException postgres &&
-        postgres.SqlState == CodigoViolacaoDeUnicidade;
 }

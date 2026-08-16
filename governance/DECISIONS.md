@@ -271,3 +271,32 @@ Formato:
 - **Porquê:** segue o mesmo princípio de separação por tipo aplicado nas TASKs anteriores,
   tornando a arquitetura mais consistente e organizada. Cada tipo de infraestrutura tem sua
   própria pasta, facilitando manutenção e expansão futura
+
+### [TASK-ARCH-07] Repositórios na fronteira Aplicação × Infraestrutura
+- **Situação:** escolha técnica — serviços da Aplicação injetavam `AppDbContext` diretamente
+  (acoplamento a EF/Npgsql, contraria a Clean Architecture que isola domínio/aplicação de
+  acesso a dados — SPEC 7)
+- **O que a spec diz:** SPEC 7 — "domínio isolado de framework e de acesso a dados"; a Aplicação
+  não pode conhecer a camada de infraestrutura
+- **Decisão:** **interfaces de repositório em `Aplicacao/Repositorios/`** (`IPlanoRepositorio`,
+  `IBeneficiarioRepositorio`) e **implementações em `Infraestrutura/Persistence/Repositorios/`**
+  que encapsulam o `AppDbContext`. Serviços dependem só das interfaces; o DI registra
+  `AddScoped<IX, X>()`. Um teste de dependência (`RegraDeDependenciaTests`) lê o fonte de
+  `Aplicacao/Servicos/*.cs` e falha se aparecer `using Desafio.Api.Infraestrutura`,
+  `Microsoft.EntityFrameworkCore` ou `Npgsql`
+- **Porquê:** a Clean Architecture exige que a Aplicação declare a própria porta (interface) e a
+  Infraestrutura a implemente — a seta da dependência aponta de Infra para Aplicação. Isso deixa
+  a regra visível no código e a torna testável (é a mesma motivação do teste RED que iniciou a
+  task). Sem mudança de comportamento: suíte passou de 79/79 para 80/80 (só o teste novo de
+  arquitetura foi adicionado)
+
+### [TASK-ARCH-07] Fluent API por entidade em `IEntityTypeConfiguration<T>`
+- **Situação:** escolha técnica — a configuração Fluent API do EF Core estava toda no
+  `OnModelCreating` do `AppDbContext` (um arquivo monolítico acumulando configurações de Planos
+  e Beneficiários)
+- **Decisão:** extrair a Fluent API para uma classe **por entidade** em
+  `Infraestrutura/Persistence/Configuracoes/` (`PlanoConfiguration.cs`,
+  `BeneficiarioConfiguration.cs`), registradas via `ApplyConfigurationsFromAssembly`
+- **Porquê:** SOLID (Single Responsibility) — cada entidade tem a própria configuração no próprio
+  arquivo, em vez de tudo centralizado no DbContext; segue o mesmo critério de "um tipo por
+  arquivo" já adotado em Dominio/Aplicacao (TASK-ARCH-03) e Infraestrutura (TASK-INF-01)

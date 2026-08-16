@@ -1,37 +1,26 @@
 using Desafio.Api.Aplicacao.Contratos;
+using Desafio.Api.Aplicacao.Repositorios;
 using Desafio.Api.Dominio.Entidades;
 using Desafio.Api.Dominio.Excecoes;
-using Desafio.Api.Infraestrutura.Persistence;
-using Microsoft.EntityFrameworkCore;
-using Npgsql;
 
 namespace Desafio.Api.Aplicacao.Servicos;
 
-public class PlanoServico(AppDbContext db)
+public class PlanoServico(IPlanoRepositorio planos)
 {
-    private const string CodigoViolacaoDeUnicidade = "23505";
+    public async Task<IReadOnlyList<Plano>> ListarAsync(CancellationToken cancellationToken) =>
+        await planos.ListarAsync(cancellationToken);
 
-    public async Task<IReadOnlyList<Plano>> ListarAsync(CancellationToken cancellationToken)
-    {
-        return await db.Planos
-            .AsNoTracking()
-            .OrderBy(p => p.Nome)
-            .ToListAsync(cancellationToken);
-    }
-
-    public async Task<Plano> ObterAsync(Guid id, CancellationToken cancellationToken)
-    {
-        return await db.Planos.FirstOrDefaultAsync(p => p.Id == id, cancellationToken)
-               ?? throw new NaoEncontradoException("Plano não encontrado");
-    }
+    public async Task<Plano> ObterAsync(Guid id, CancellationToken cancellationToken) =>
+        await planos.ObterPorIdAsync(id, cancellationToken)
+        ?? throw new NaoEncontradoException("Plano não encontrado");
 
     public async Task<Plano> CriarAsync(PlanoRequestDados dados, CancellationToken cancellationToken)
     {
         var plano = new Plano(dados.Nome, dados.CodigoRegistroAns);
 
         await GarantirUnicidadeAsync(plano, cancellationToken);
-        db.Planos.Add(plano);
-        await SalvarAsync(cancellationToken);
+        await planos.AdicionarAsync(plano, cancellationToken);
+        await planos.SalvarAsync(cancellationToken);
 
         return plano;
     }
@@ -42,7 +31,7 @@ public class PlanoServico(AppDbContext db)
 
         plano.DefinirDados(dados.Nome, dados.CodigoRegistroAns);
         await GarantirUnicidadeAsync(plano, cancellationToken);
-        await SalvarAsync(cancellationToken);
+        await planos.SalvarAsync(cancellationToken);
 
         return plano;
     }
@@ -52,19 +41,14 @@ public class PlanoServico(AppDbContext db)
         var plano = await ObterAsync(id, cancellationToken);
 
         plano.Excluir();
-        await SalvarAsync(cancellationToken);
+        await planos.SalvarAsync(cancellationToken);
     }
 
-    // Nome e código de registro ANS continuam ocupados depois da exclusão lógica,
-    // por isso a verificação ignora o filtro de consulta.
+    // Nome e código de registro ANS continuam ocupados depois da exclusão lógica, por isso
+    // a consulta de conflito vem do repositório (que ignora o filtro de consulta).
     private async Task GarantirUnicidadeAsync(Plano plano, CancellationToken cancellationToken)
     {
-        var conflito = await db.Planos
-            .IgnoreQueryFilters()
-            .AsNoTracking()
-            .Where(p => p.Id != plano.Id)
-            .Where(p => p.Nome == plano.Nome || p.CodigoRegistroAns == plano.CodigoRegistroAns)
-            .FirstOrDefaultAsync(cancellationToken);
+        var conflito = await planos.ObterConflitanteAsync(plano, cancellationToken);
 
         if (conflito is null)
         {
@@ -76,22 +60,4 @@ public class PlanoServico(AppDbContext db)
             "Já existe plano cadastrado com esse valor",
             [new DetalheErro(campo, "duplicado")]);
     }
-
-    // A verificação acima não elimina a corrida entre duas requisições simultâneas.
-    // A garantia real é o índice único no banco; aqui a violação vira 409.
-    private async Task SalvarAsync(CancellationToken cancellationToken)
-    {
-        try
-        {
-            await db.SaveChangesAsync(cancellationToken);
-        }
-        catch (DbUpdateException excecao) when (EhViolacaoDeUnicidade(excecao))
-        {
-            throw new ConflitoException("Já existe plano cadastrado com esse valor");
-        }
-    }
-
-    private static bool EhViolacaoDeUnicidade(DbUpdateException excecao) =>
-        excecao.InnerException is PostgresException postgres &&
-        postgres.SqlState == CodigoViolacaoDeUnicidade;
 }
