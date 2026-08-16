@@ -63,6 +63,19 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       criadas subpastas `Persistence/` e `Configuration/`; arquivos movidos; namespaces
       atualizados em todos os arquivos afetados; migrations atualizadas — 79/79 GREEN
       (ver `ai-change-records/TASK-INF-01.md`).
+- [x] **TASK-DRY-01** — Refatorar para DRY: criar `ITimeProvider` (domínio) com implementação
+      `SystemTimeProvider` para abstrair `DateTime.UtcNow`; criar métodos auxiliares de
+      validação comum no domínio (`ValidadorCampo.Obrigatorio`, `ValidadorCampo.TamanhoInvalido`)
+      para eliminar repetição de `DetalheErro`. **Feito 2026-08-15**: interface + default no
+      domínio (DateTime.UtcNow é BCL, não framework); ValidadorCampo nas entidades — 79/79
+      GREEN (commit `62e8dee`).
+- [x] **TASK-ARCH-07** — Inverter a dependência da Aplicação: serviços deixam de conhecer
+      `AppDbContext`/EF/Npgsql. Interfaces de repositório em `Aplicacao/Repositorios/`,
+      implementações em `Infraestrutura/Persistence/Repositorios/`. A regra de dependência da
+      Clean Architecture passa a ser visível no código (e testada). **Feito 2026-08-15**:
+      interfaces + implementações criadas, serviços reescritos, Fluent API extraída para
+      `IEntityTypeConfiguration` por entidade, teste de dependência RED→GREEN — 80/80
+      (ver `ai-change-records/TASK-ARCH-07.md`).
 
 ## Fase 2 — Backend, módulo Beneficiários
 
@@ -115,14 +128,28 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
 
 ## Fase 3 — Frontend, módulo Beneficiários
 
-- [ ] **TASK-FE-01** — Listagem de Beneficiários: nome, CPF, nascimento, status, nome do plano
+- [x] **TASK-FE-01** — Listagem de Beneficiários: nome, CPF, nascimento, status, nome do plano
       (resolvido via `GET /planos`, não `plano_id` cru), filtros combináveis, paginação.
-- [ ] **TASK-FE-02** — Formulário de cadastro/edição: validação client-side (obrigatórios,
-      formato de CPF, data passada), CPF não editável na edição.
-- [ ] **TASK-FE-03** — Mapear erros da API (400/409/422) para mensagem legível na tela, não
-      `console.log` nem tela em branco.
-- [ ] **TASK-FE-04** — Estado de loading e de lista vazia; exclusão só some da lista após
-      resposta de sucesso do `DELETE`.
+      **Feito 2026-08-15**: módulo `beneficiarios/` (modelo tipado, serviço isolado com
+      `HttpParams`, lista com filtros status+plano combináveis e paginação prev/anterior);
+      nome do plano resolvido via `PlanoServico`. Build Angular 20 GREEN (ver
+      `ai-change-records/TASK-FE-01.md`).
+- [x] **TASK-FE-02** — Formulário de cadastro/edição: validação client-side (obrigatórios,
+      formato de CPF, data passada), CPF não editável na edição. **Feito 2026-08-15**:
+      `BeneficiarioFormulario` com reactive forms (`Validators.required/minLength/maxLength` +
+      `cpfFormatoValido` espelhando o `CpfValidator` do backend + `dataNoPassado`); CPF
+      `disable()` na edição; `@Input beneficiario` null=cadastro / preenchido=edição (ver
+      `ai-change-records/TASK-FE-02.md`).
+- [x] **TASK-FE-03** — Mapear erros da API (400/409/422) para mensagem legível na tela, não
+      `console.log` nem tela em branco. **Feito 2026-08-15**: reuso de `mensagemDeErro` (do
+      `nucleo/api.ts`, padrão de Planos) no formulário e na listagem; erro 409/422/400 aparece
+      no topo do formulário, erro da listagem no lugar da tabela (ver
+      `ai-change-records/TASK-FE-03.md`).
+- [x] **TASK-FE-04** — Estado de loading e de lista vazia; exclusão só some da lista após
+      resposta de sucesso do `DELETE`. **Feito 2026-08-15**: estados `carregando`/`erro`/lista
+      vazia no template; `excluir()` remove a linha só no `next` do DELETE (no `error` o item
+      continua e a mensagem da API aparece); `confirm()` antes de excluir (ver
+      `ai-change-records/TASK-FE-04.md`).
 
 ## Fase 4 — Entrega
 

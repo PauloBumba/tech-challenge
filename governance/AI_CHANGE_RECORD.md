@@ -25,5 +25,10 @@ completo daquela mudança (testes rodados, evidência RED, arquivos alterados). 
 | TASK-BEN-09 | Regras de exclusão lógica de planos: validação via query filter (já implementado); 2 testes de integração como evidência | ff0fb74 | 79/79 |
 | TASK-BEN-10 | Tratamento de erro centralizado: validação via middleware (já implementado); 4 testes de integração como evidência | 41faf44 | 79/79 |
 | TASK-INF-01 | Reorganização de Infraestrutura: subdivisão em Persistence/ e Configuration/; namespaces atualizados | bb384b4 | 79/79 |
+| TASK-FE-01 | Frontend — listagem de Beneficiários: módulo beneficiarios/, filtros combináveis, paginação, nome do plano via GET /planos | — | build Angular GREEN |
+| TASK-FE-02 | Frontend — formulário cadastro/edição: reactive forms, CPF espelhando CpfValidator, CPF não editável na edição | — | build Angular GREEN |
+| TASK-FE-03 | Frontend — erros da API (400/409/422) viram mensagem na tela via mensagemDeErro | — | build Angular GREEN |
+| TASK-FE-04 | Frontend — loading/lista vazia; exclusão só some após sucesso do DELETE | — | build Angular GREEN |
+| TASK-ARCH-07 | Inversão de dependência da Aplicação: interfaces de repositório em Aplicacao/Repositorios, implementações em Infraestrutura/Persistence/Repositorios; serviços sem EF/Npgsql; Fluent API extraída para IEntityTypeConfiguration por entidade; teste de dependência RED→GREEN | — | 80/80 |
 
 <!-- Nova linha a cada task concluída, ver POST_TASK_WORKFLOW.md item 4 -->

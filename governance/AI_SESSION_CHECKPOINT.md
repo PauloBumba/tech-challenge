@@ -3,11 +3,26 @@
 Atualizar ao fim de cada sessão de trabalho (ou quando o contexto da IA for reiniciado).
 Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md`, Seção 8.
 
-**Data/sessão:** 2026-08-14
-**Última TASK concluída:** TASK-INF-01 (reorganização de Infraestrutura — subdivisão em Persistence e Configuration)
-**Testes:** `dotnet test` — **79/79 GREEN** (suíte inteira)
+**Data/sessão:** 2026-08-15
+**Última TASK concluída:** TASK-ARCH-07 (inversão de dependência da Aplicação — repositórios)
+**Testes:** backend `dotnet test` — **80/80 GREEN** (suíte inteira); frontend `npm run build` — GREEN
 
 ## Arquivos alterados nesta sessão
+
+- **Frontend — Beneficiários (TASK-FE-01 a TASK-FE-04):** `src/app/beneficiarios/` (novo —
+  `beneficiario.ts` modelos, `beneficiario-servico.ts`, `beneficiario-lista.ts|html|css`,
+  `beneficiario-formulario.ts|html|css`, `cpf.ts`), `src/app/app.ts` e `src/app/app.html`
+  (monta o `BeneficiarioLista` no lugar do bloco pendente)
+- **Governança:** `TASKS.md` (FE-01 a FE-04 → done), `PROJECT_STATE.md`, `AI_CHANGE_RECORD.md`,
+  `AI_USAGE.md`, `ai-change-records/TASK-FE-01.md` a `TASK-FE-04.md`
+- **Inversão de dependência (TASK-ARCH-07):** `Aplicacao/Repositorios/IPlanoRepositorio.cs` e
+  `IBeneficiarioRepositorio.cs` (novas), `Infraestrutura/Persistence/Repositorios/PlanoRepositorio.cs`
+  e `BeneficiarioRepositorio.cs` (novas), `Aplicacao/Servicos/PlanoServico.cs` e
+  `BeneficiarioServico.cs` (reescritos para depender só das interfaces), Fluent API extraída
+  para `Infraestrutura/Persistence/Configuracoes/PlanoConfiguration.cs` e
+  `BeneficiarioConfiguration.cs` (`IEntityTypeConfiguration`), `AppDbContext.cs` com
+  `ApplyConfigurationsFromAssembly`, `Infraestrutura/Dependencias.cs` registrando repositórios,
+  `tests/Unitarios/Aplicacao/Arquitetura/RegraDeDependenciaTests.cs` (novo, RED→GREEN) — 80/80
 
 - **Validador de CPF (TASK-BEN-08):** `Dominio/Validadores/CpfValidator.cs` (novo — algoritmo oficial de CPF), `Dominio/Entidades/Beneficiario.cs` (substituída validação simples por CpfValidator), `tests/Unitarios/Dominio/Validadores/CpfValidatorTests.cs` (novo — 19 testes), `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (2 testes novos)
 - **Regras de exclusão lógica (TASK-BEN-09):** `tests/Integracao/Beneficiarios/BeneficiariosTests.cs` (2 testes de validação — funcionalidade já existia via query filter)
@@ -62,11 +77,13 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
 
 ## Próxima TASK
 
-- Backend de Beneficiários está completo. Infraestrutura reorganizada. Próxima fase: Frontend (TASK-FE-01 a TASK-FE-04).
+- Frontend de Beneficiários completo (FE-01 a FE-04 GREEN). Backend com TASK-ARCH-07 GREEN
+  (repositórios, 80/80). Próxima: **Fase 4 — Entrega** (TASK-ENT-01 a TASK-ENT-04): imagens
+  multi-arch, `participantes/paulobumba/`, `./verificar.sh` e README de entrega.
 
 ## Bloqueios / dúvidas em aberto
 
-- Nenhum. Backend de Beneficiários inteiro GREEN (79/79).
+- Nenhum. Backend de Beneficiários inteiro GREEN (80/80) + frontend montado.
 
 ## Decisões tomadas nesta sessão (resumo — detalhe fica em `DECISIONS.md`)
 
@@ -100,6 +117,10 @@ Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md
   4 testes de integração como evidência. Suíte 79/79.
 - TASK-INF-01: Infraestrutura subdividida em Persistence/ e Configuration/ seguindo Clean
   Architecture; namespaces atualizados em todos os arquivos afetados. Suíte 79/79.
+- TASK-ARCH-07: repositórios na fronteira Aplicação × Infraestrutura (interfaces em
+  Aplicacao/Repositorios, impl em Infraestrutura/Persistence/Repositorios); serviços sem
+  EF/Npgsql; Fluent API por entidade em IEntityTypeConfiguration; teste de dependência
+  RED→GREEN. Suíte 80/80.
 - TASK-ARCH-06: commit agora em Conventional Commits + `TASK: <ID>` (padrão da empresa).
 - ADR-ARQ-01: Clean Architecture em camadas, **não** Vertical Slice (código base já era em
   camadas; SPEC 8 cita Planos como padrão da casa).

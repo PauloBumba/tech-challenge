@@ -1,0 +1,107 @@
+<section class="cartao">
+  <header class="cabecalho">
+    <h2>Beneficiários</h2>
+    <button type="button" class="botao primario" (click)="abrirCadastro()">Novo beneficiário</button>
+  </header>
+
+  @if (formularioAberto()) {
+    <app-beneficiario-formulario
+      [beneficiario]="beneficiarioEmEdicao()"
+      [planos]="planos()"
+      (salvo)="aoSalvar()"
+      (cancelado)="fecharFormulario()"
+    />
+  }
+
+  <div class="filtros">
+    <label>
+      <span>Situação</span>
+      <select
+        [value]="filtroStatus() ?? ''"
+        (change)="filtroStatus.set(($any($event.target).value || null)); filtrar()"
+      >
+        <option value="">Todas</option>
+        @for (status of ['ATIVO', 'INATIVO']; track status) {
+          <option [value]="status">{{ status }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      <span>Plano</span>
+      <select
+        [value]="filtroPlanoId() ?? ''"
+        (change)="filtroPlanoId.set(($any($event.target).value || null)); filtrar()"
+      >
+        <option value="">Todos</option>
+        @for (plano of planos(); track plano.id) {
+          <option [value]="plano.id">{{ plano.nome }}</option>
+        }
+      </select>
+    </label>
+
+    <button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">
+      Recarregar
+    </button>
+  </div>
+
+  @if (carregando()) {
+    <p class="aviso">Carregando beneficiários...</p>
+  } @else if (erro()) {
+    <p class="aviso erro">{{ erro() }}</p>
+  } @else if (beneficiarios().length === 0) {
+    <p class="aviso">Nenhum beneficiário encontrado.</p>
+  } @else {
+    <table>
+      <thead>
+        <tr>
+          <th>Nome completo</th>
+          <th>CPF</th>
+          <th>Nascimento</th>
+          <th>Situação</th>
+          <th>Plano</th>
+          <th class="coluna-acoes">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (beneficiario of beneficiarios(); track beneficiario.id) {
+          <tr>
+            <td>{{ beneficiario.nome_completo }}</td>
+            <td>{{ formatarCpf(beneficiario.cpf) }}</td>
+            <td>{{ beneficiario.data_nascimento }}</td>
+            <td>{{ beneficiario.status }}</td>
+            <td>{{ nomeDoPlano(beneficiario.plano_id) }}</td>
+            <td class="coluna-acoes">
+              <button type="button" class="botao" (click)="abrirEdicao(beneficiario)">Editar</button>
+              <button type="button" class="botao" (click)="excluir(beneficiario)">Excluir</button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+
+    <footer class="paginacao">
+      <span>
+        Página {{ pagina() }} de {{ totalDePaginas() }} · {{ total() }} beneficiário{{ total() === 1 ? '' : 's' }}
+      </span>
+      <div>
+        <button
+          type="button"
+          class="botao"
+          (click)="mudarPagina(pagina() - 1)"
+          [disabled]="pagina() <= 1"
+        >
+          Anterior
+        </button>
+        <button
+          type="button"
+          class="botao"
+          (click)="mudarPagina(pagina() + 1)"
+          [disabled]="pagina() >= totalDePaginas()"
+        >
+          Próxima
+        </button>
+      </div>
+    </footer>
+  }
+</section>

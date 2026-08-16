@@ -106,3 +106,30 @@ Formato:
 - **Prompt que mais influenciou o resultado:** "sim" — usuário solicitou reorganização de Infraestrutura
 - **Trecho não trivial gerado:** nenhum — apenas criação de pastas e atualização de namespaces
 - **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-ARCH-07]
+- **Nível de uso:** IA como par — a IA extraiu as interfaces/implementações de repositório e a
+  Fluent API por entidade sob pedido explícito do Paulo (teste de dependência RED primeiro)
+- **Prompt que mais influenciou o resultado:** "teste que a Aplicação não pode depender de
+  Infraestrutura/EF/Npgsql" — gerou o `RegraDeDependenciaTests` que lê o fonte dos serviços
+- **Trecho não trivial gerado:** `BeneficiarioRepositorio.SalvarAsync` — conversão de
+  `DbUpdateException` (Postgres 23505) em `ConflitoException`; e `ListarAsync` resolvendo os
+  planos da página em uma única consulta `IN` (anti-N+1 herdado de TASK-BEN-06)
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-FE-01 a TASK-FE-04] Módulo de Beneficiários no frontend (listagem, formulário, erros, estados)
+- **Nível de uso:** IA como par — o Paulo pediu foco no frontend ("vamos no front end"); a IA
+  construiu o módulo seguindo o padrão do bloco de Planos (modelo tipado, serviço isolado com
+  `API_BASE` injetado, `mensagemDeErro`, `takeUntilDestroyed`)
+- **Prompt que mais influenciou o resultado:** "vamos no front end pode ser" + foco em
+  TASK-FE-01 a TASK-FE-04
+- **Trecho não trivial gerado:** `beneficiarios/cpf.ts` — `cpfValido` espelhando o algoritmo
+  oficial do CPF (dígitos verificadores, peso 10→2 e 11→2, resto < 2 → 0 senão 11-resto,
+  rejeição de sequências repetidas), mesmo comportamento do `CpfValidator` do backend; e
+  `beneficiario-formulario.ts` — validators customizados (`cpfFormatoValido`, `dataNoPassado`)
+  em reactive forms
+- **Ainda não explicaria com segurança:** não

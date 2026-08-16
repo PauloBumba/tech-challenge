@@ -1,0 +1,117 @@
+.cartao {
+  background: #fff;
+  border: 1px solid #dcdfe4;
+  border-radius: 8px;
+  padding: 1.25rem 1.5rem;
+  display: grid;
+  gap: 1rem;
+}
+
+.cabecalho {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.cabecalho h2 {
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.filtros {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.filtros label {
+  display: grid;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: #374151;
+}
+
+.filtros select {
+  font: inherit;
+  padding: 0.4rem 0.6rem;
+  border: 1px solid #c3c8d0;
+  border-radius: 6px;
+  background: #fff;
+}
+
+.botao {
+  border: 1px solid #c3c8d0;
+  background: #f6f7f9;
+  border-radius: 6px;
+  padding: 0.4rem 0.9rem;
+  cursor: pointer;
+  font: inherit;
+}
+
+.botao.primario {
+  background: #1d4ed8;
+  border-color: #1d4ed8;
+  color: #fff;
+}
+
+.botao:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 0.55rem 0.5rem;
+  border-bottom: 1px solid #eceef1;
+}
+
+th {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #6b7280;
+}
+
+.coluna-acoes {
+  text-align: right;
+  white-space: nowrap;
+}
+
+.coluna-acoes .botao + .botao {
+  margin-left: 0.4rem;
+}
+
+.aviso {
+  margin: 0;
+  color: #6b7280;
+}
+
+.aviso.erro {
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 6px;
+  padding: 0.5rem 0.75rem;
+}
+
+.paginacao {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.paginacao div {
+  display: flex;
+  gap: 0.5rem;
+}
