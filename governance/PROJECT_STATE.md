@@ -3,9 +3,9 @@
 Atualizar a cada commit (Seção 3 do `AGENTS.md`). Tamanho fixo — resumo, não histórico
 completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 
-**Última atualização:** 2026-08-16
-**Última TASK concluída:** TASK-FE-06 (infra E2E do frontend com Playwright — corrigiu bug NG0203)
-**Testes:** `dotnet test` — **80/80 GREEN**; frontend `npm run build` GREEN + `npm run e2e` GREEN
+**Última atualização:** 2026-08-15
+**Última TASK concluída:** TASK-OBS-01 (observabilidade: `/metrics` Prometheus + log de requisição estruturado)
+**Testes:** `dotnet test` — **84/84 GREEN**; frontend `npm run build` GREEN + `npm run e2e` GREEN
 
 ### Backend — `Desafio.Api`
 
@@ -26,6 +26,7 @@ completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 || Testes escritos para o que for implementado | — | pendente | (por task) |
 || Infraestrutura organizada por tipo | misturada | subdividida (Persistence/Configuration) | TASK-INF-01 |
 || Aplicação invertendo dependência (serviços sem EF/Npgsql) | serviços acoplados ao AppDbContext | repositórios + teste de dependência GREEN | TASK-ARCH-07 |
+|| Observabilidade (métricas + log de requisição) | inexistente | `/metrics` Prometheus + log estruturado de requisição GREEN | TASK-OBS-01 |
 
 | Item | Situação inicial | Situação atual | Task |
 | --- | --- | --- | --- |
@@ -36,6 +37,7 @@ completo (histórico completo é o Git + `governance/AI_CHANGE_RECORD.md`).
 | Estados de loading / lista vazia | faltando | pronto (loading/erro/vazio; exclusão só some após sucesso do DELETE) | TASK-FE-04 |
 | Visual (CSS) | cru | polido (badges de status, hover/focus, campo inválido; sem biblioteca — SPEC 9 não pontua design) | TASK-FE-05 |
 | Teste E2E do frontend (navegador) | faltando | pronto (Playwright, smoke do fluxo da entrevista); revelou e corrigiu NG0203 | TASK-FE-06 |
+| Indicador de saúde da API no front | faltando | pronto (GET /health a cada 30s; online/indisponível no topo) | TASK-FE-07 |
 
 ### Entrega
 

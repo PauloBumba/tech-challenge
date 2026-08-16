@@ -158,3 +158,13 @@ Formato:
   gerador de CPF aleatório válido no spec (mesmo algoritmo do `CpfValidator`, para não colidir
   com CPF de excluído logicamente que continua ocupado — TASK-BEN-05)
 - **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-FE-07] Indicador de saúde da API no frontend
+- **Nível de uso:** IA como par — pedido do Paulo ("analisar a saúde da API a partir do front")
+- **Prompt que mais influenciou o resultado:** "manda para o front esse analisar a saúde da API"
+- **Trecho não trivial gerado:** reuso do padrão da casa (`HttpClient` + `API_BASE` +
+  `takeUntilDestroyed(this.destroyRef)`); o teste de "API fora do ar" usa `page.route` com
+  `abort` para simular falha de rede/CORS sem depender de derrubar o container
+- **Ainda não explicaria com segurança:** não

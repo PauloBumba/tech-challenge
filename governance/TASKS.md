@@ -76,9 +76,12 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       interfaces + implementações criadas, serviços reescritos, Fluent API extraída para
       `IEntityTypeConfiguration` por entidade, teste de dependência RED→GREEN — 80/80
       (ver `ai-change-records/TASK-ARCH-07.md`).
-- [ ] **TASK-OBS-01** — Observabilidade: endpoint `GET /metrics` em formato Prometheus com
+- [x] **TASK-OBS-01** — Observabilidade: endpoint `GET /metrics` em formato Prometheus com
       contagem/duração de requisições por rota+status (via `System.Diagnostics.Metrics`,
       sem dependência externa) e log estruturado de requisição (SPEC §7) sem interpolação.
+      **Feito 2026-08-15**: `MetricasDeRequisicao` (Meter nativo + serialização Prometheus),
+      `MetricasMiddleware`, `RegistroDeRequisicaoMiddleware`, `GET /metrics` — RED→GREEN,
+      suíte **84/84** (ver `ai-change-records/TASK-OBS-01.md`).
 
 ## Fase 2 — Backend, módulo Beneficiários
 
@@ -164,6 +167,11 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
       `e2e/beneficiarios.spec.ts`; revelou e corrigiu bug real **NG0203** (`takeUntilDestroyed()`
       sem `DestroyRef` em handler de clique — quebrava cadastro/edição/exclusão no navegador);
       suíte `npm run e2e` GREEN contra `docker compose up`.
+- [x] **TASK-FE-07** — Indicador de saúde da API no topo do frontend: consulta `GET /health` na
+      carga e a cada 30s; "API online" (verde) quando 200, "API indisponível" (vermelho) em
+      qualquer falha (503 de banco, rede, CORS). **Feito 2026-08-16**: `HealthServico` +
+      `StatusDaApi` em `nucleo/`, montado no cabeçalho; 2 testes E2E novos (online + falha
+      simulada via `page.route`); suíte `npm run e2e` **3 passed**.
 
 ## Fase 4 — Entrega
 

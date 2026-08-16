@@ -32,5 +32,6 @@ completo daquela mudança (testes rodados, evidência RED, arquivos alterados). 
 | TASK-ARCH-07 | Inversão de dependência da Aplicação: interfaces de repositório em Aplicacao/Repositorios, implementações em Infraestrutura/Persistence/Repositorios; serviços sem EF/Npgsql; Fluent API extraída para IEntityTypeConfiguration por entidade; teste de dependência RED→GREEN | abeb172 | 80/80 |
 | TASK-FE-05 | Frontend — polish de CSS: badges de status, hover/focus, campo inválido, CSS morto removido; sem biblioteca de componentes (SPEC 9 não pontua design) | a618e2f | build Angular GREEN |
 | TASK-FE-06 | Frontend — infra E2E (Playwright): smoke test do fluxo da entrevista; revelou e corrigiu bug NG0203 (takeUntilDestroyed sem DestroyRef em handler) | a618e2f | npm run e2e GREEN |
+| TASK-FE-07 | Frontend — indicador de saúde da API no topo (GET /health, a cada 30s; online/indisponível); 2 testes E2E | — | npm run e2e GREEN (3 passed) |
 
 <!-- Nova linha a cada task concluída, ver POST_TASK_WORKFLOW.md item 4 -->

@@ -4,11 +4,14 @@ Atualizar ao fim de cada sessão de trabalho (ou quando o contexto da IA for rei
 Objetivo: retomar no dia seguinte sem reconstruir de memória — ver `AGENTS.md`, Seção 8.
 
 **Data/sessão:** 2026-08-16
-**Última TASK concluída:** TASK-FE-06 (infra E2E do frontend com Playwright — corrigiu bug NG0203)
-**Testes:** backend `dotnet test` — **80/80 GREEN** (suíte inteira); frontend `npm run build` GREEN + `npm run e2e` GREEN
+**Última TASK concluída:** TASK-FE-07 (indicador de saúde da API no frontend)
+**Testes:** backend `dotnet test` — **80/80 GREEN** (suíte inteira); frontend `npm run build` GREEN + `npm run e2e` GREEN (3 passed)
 
 ## Arquivos alterados nesta sessão
 
+- **Indicador de saúde (TASK-FE-07):** `src/app/nucleo/health-servico.ts` e `status-da-api.ts`
+  (novos — GET /health a cada 30s, "API online"/"indisponível" no topo), `app.html|app.ts|app.css`
+  (monta o `app-status-da-api`), `e2e/status-da-api.spec.ts` (2 testes: online + falha simulada)
 - **Polish de CSS (TASK-FE-05):** `app.css`, `beneficiario-lista.css|html`,
   `beneficiario-formulario.css|html`, `planos-lista.css|html` — badges de status, hover/focus,
   campo inválido, CSS morto removido; sem biblioteca de componentes (SPEC 9 não pontua design)
