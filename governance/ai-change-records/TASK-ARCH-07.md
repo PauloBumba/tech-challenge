@@ -1,6 +1,6 @@
 # TASK-ARCH-07 — Inversão de dependência da Aplicação (repositórios)
 
-**Commit:** (hash, preencher depois de commitar)
+**Commit:** abeb172
 **Data:** 2026-08-15
 
 ## O que mudou
