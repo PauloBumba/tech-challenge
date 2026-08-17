@@ -2,7 +2,7 @@
 
 ## 1. Resumo da entrega
 
-Corrigi 20 defeitos no módulo de Beneficiários (catalogados no diagnóstico inicial TASK-DIAG-02) e implementei os endpoints que faltavam (consulta por id, atualização e exclusão lógica), além de paginação e filtros combináveis na listagem. A validação de CPF passou a conferir os dígitos verificadores e rejeitar sequências repetidas usando o algoritmo oficial brasileiro, e a unicidade agora é garantida por índice único no banco, não por verificação prévia. No frontend implementei completamente o módulo de Beneficiários seguindo o padrão do bloco de Planos, incluindo listagem com filtros e paginação, formulário de cadastro/edição com validação client-side, tratamento de erro estruturado, estados de loading/vazio e um smoke test E2E do fluxo da entrevista. Também adicionei observabilidade com endpoint `/metrics` em formato Prometheus e log estruturado de requisição. Refatorei a arquitetura para Clean Architecture com camadas subdivididas por tipo, injeção de dependência por camada e repositórios isolando a Aplicação do EF/Npgsql. A suíte de testes está 84/84 GREEN (backend) + 3/3 E2E (frontend).
+Corrigi 20 defeitos no módulo de Beneficiários (catalogados no diagnóstico inicial TASK-DIAG-02) e implementei os endpoints que faltavam (consulta por id, atualização e exclusão lógica), além de paginação e filtros combináveis na listagem. A validação de CPF passou a conferir os dígitos verificadores e rejeitar sequências repetidas usando o algoritmo oficial brasileiro, e a unicidade agora é garantida por índice único no banco, não por verificação prévia. No frontend implementei completamente o módulo de Beneficiários seguindo o padrão do bloco de Planos, incluindo listagem com filtros e paginação, formulário de cadastro/edição com validação client-side, tratamento de erro estruturado, estados de loading/vazio e um smoke test E2E do fluxo da entrevista. Também adicionei observabilidade com endpoint `/metrics` em formato Prometheus e log estruturado de requisição. Refatorei a arquitetura para Clean Architecture com camadas subdivididas por tipo, injeção de dependência por camada e repositórios isolando a Aplicação do EF/Npgsql. A suíte de testes está 88/88 GREEN (backend) + 3/3 E2E (frontend).
 
 ---
 
@@ -133,9 +133,16 @@ Corrigi 20 defeitos no módulo de Beneficiários (catalogados no diagnóstico in
 - **Contexto:** SPEC 7 exige observabilidade
 - **Motivo:** Sem dependência externa, .NET 10 já tem. Rota-template em vez de path para controlar cardinalidade
 
+**6. Reorganização de pastas do backend**
+
+- **Contexto:** O README do desafio alerta que mover pastas deixa o diff do PR ilegível, e que o módulo de Planos é a referência do padrão da casa
+- **Decisão registrada:** Mantive a reorganização (clean architecture por tipo: `Api/Controllers`, `Aplicacao/Servicos`, `Dominio/Entidades`, `Infraestrutura/Persistence`, testes em `Integracao/...`) mesmo ciente do impacto no diff
+- **Por quê:** A reorganização veio junto das 44 tasks e a suíte segue verde; reverter agora teria risco de regressão no prazo. Reconheço o trade-off: a legibilidade do diff ficou pior, e entendo que na avaliação a leitura do PR conta
+- **O que eu consideraria se fosse decidir diferente:** Adiar a reorganização para depois da entrega, mantendo o diff mínimo sobre o código base
+
 ### 2.5 O que ficou de fora
 
-Nada ficou de fora. Todas as 44 tasks (backend + frontend + arquitetura) foram concluídas, suíte 84/84 GREEN + E2E 3/3.
+Nada ficou de fora. Todas as 44 tasks (backend + frontend + arquitetura) foram concluídas, suíte 88/88 GREEN + E2E 3/3.
 
 ---
 
