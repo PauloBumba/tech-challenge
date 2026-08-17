@@ -123,14 +123,14 @@
 }
 
 .botao.primario {
-  background: #1d4ed8;
-  border-color: #1d4ed8;
+  background: #0f766e;
+  border-color: #0f766e;
   color: #fff;
 }
 
 .botao.primario:hover:not(:disabled) {
-  background: #1e40af;
-  border-color: #1e40af;
+  background: #134e4a;
+  border-color: #134e4a;
 }
 
 .botao:disabled {
