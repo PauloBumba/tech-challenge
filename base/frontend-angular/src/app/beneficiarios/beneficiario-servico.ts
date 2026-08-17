@@ -1,6 +1,6 @@
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, catchError, forkJoin, map, of } from 'rxjs';
 
 import { API_BASE } from '../nucleo/api';
 import { Beneficiario, PaginaDeBeneficiarios, StatusBeneficiario } from './beneficiario';
@@ -51,6 +51,30 @@ export class BeneficiarioServico {
     return this.http.get<PaginaDeBeneficiarios>(`${this.base}/beneficiarios`, {
       params: parametros
     });
+  }
+
+  /**
+   * Conta beneficiários de cada plano pelo `total` do envelope, filtrando por
+   * `plano_id`. A API limita `tamanho` a 100, então não dá para puxar a lista
+   * inteira e agrupar no cliente — o total já vem agregado no filtro.
+   */
+  contarPorPlanos(planoIds: string[]): Observable<Map<string, number>> {
+    if (planoIds.length === 0) {
+      return of(new Map());
+    }
+
+    return forkJoin(
+      planoIds.map((planoId) =>
+        this.listar({ pagina: 1, tamanho: 1, status: null, planoId }).pipe(
+          map((pagina) => [planoId, pagina.total] as const),
+          catchError(() => of([planoId, 0] as const))
+        )
+      )
+    ).pipe(map((pares) => new Map(pares)));
+  }
+
+  obter(id: string): Observable<Beneficiario> {
+    return this.http.get<Beneficiario>(`${this.base}/beneficiarios/${id}`);
   }
 
   criar(dados: BeneficiarioDados): Observable<Beneficiario> {

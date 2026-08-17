@@ -118,3 +118,242 @@ th {
   table { min-width: 420px; }
   .cartao:has(table) { overflow-x: auto; }
 }
+
+/* Cards de métricas */
+.metricas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+/* Filtros */
+.filtros {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+  flex-wrap: wrap;
+}
+
+.campo-busca {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  flex: 1;
+  min-width: 200px;
+}
+
+.campo-busca span {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #475467;
+}
+
+.campo-busca input {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid #c3c8d0;
+  border-radius: 6px;
+  font: inherit;
+  font-size: 0.9rem;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.campo-busca input:focus {
+  outline: none;
+  border-color: #0f766e;
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.1);
+}
+
+/* Painel de distribuição */
+.painel-distribuicao {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+}
+
+.cabecalho-distribuicao {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.cabecalho-distribuicao h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.cabecalho-distribuicao p {
+  margin: 0.25rem 0 0;
+  font-size: 0.85rem;
+  color: #64748b;
+}
+
+.grafico-pizza {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+/* Grade de planos */
+.grade-planos {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.cartao-plano {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
+}
+
+.cartao-plano:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  border-color: #cbd5e1;
+}
+
+.cartao-plano-topo {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.cartao-plano-topo strong {
+  font-size: 1rem;
+  color: #1e293b;
+}
+
+.codigo-ans {
+  font-size: 0.8rem;
+  color: #64748b;
+  background: #f1f5f9;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+}
+
+.cartao-plano dl {
+  display: grid;
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+}
+
+.cartao-plano dt {
+  font-size: 0.75rem;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.cartao-plano dd {
+  margin: 0;
+  font-size: 0.95rem;
+  color: #1e293b;
+  font-weight: 500;
+}
+
+.acoes-cartao {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.acoes-cartao button {
+  flex: 1;
+  font-size: 0.85rem;
+  padding: 0.4rem 0.8rem;
+}
+
+/* Kanban de planos */
+.kanban-planos {
+  display: grid;
+  gap: 1rem;
+}
+
+.coluna-kanban {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  padding: 1rem;
+  min-height: 200px;
+}
+
+.coluna-kanban h3 {
+  margin: 0 0 0.25rem;
+  font-size: 0.95rem;
+  color: #1e293b;
+}
+
+.coluna-kanban small {
+  color: #64748b;
+  font-size: 0.8rem;
+  display: block;
+  margin-bottom: 1rem;
+}
+
+.cartao-kanban {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 6px;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  cursor: grab;
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.cartao-kanban:hover {
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  transform: translateY(-1px);
+}
+
+.cartao-kanban:active {
+  cursor: grabbing;
+}
+
+.cartao-kanban strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #1e293b;
+  margin-bottom: 0.25rem;
+}
+
+.cartao-kanban span {
+  display: block;
+  font-size: 0.8rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+}
+
+.cartao-kanban button {
+  width: 100%;
+  font-size: 0.8rem;
+  padding: 0.35rem 0.7rem;
+}
+
+/* Responsivo para grade e kanban */
+@media (max-width: 768px) {
+  .metricas {
+    grid-template-columns: 1fr;
+  }
+  
+  .filtros {
+    flex-direction: column;
+  }
+  
+  .grade-planos {
+    grid-template-columns: 1fr;
+  }
+  
+  .grafico-pizza {
+    flex-direction: column;
+    align-items: center;
+  }
+}

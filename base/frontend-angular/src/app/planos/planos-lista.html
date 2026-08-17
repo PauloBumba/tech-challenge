@@ -11,27 +11,105 @@
   } @else if (planos().length === 0) {
     <p class="aviso">Nenhum plano cadastrado.</p>
   } @else {
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Código ANS</th>
-          <th class="coluna-acoes">Ações</th>
-        </tr>
-      </thead>
-      <tbody>
-        @for (plano of planos(); track plano.id) {
-          <tr>
-            <td>{{ plano.nome }}</td>
-            <td>{{ plano.codigo_registro_ans }}</td>
-            <td class="coluna-acoes">
-              <button type="button" class="botao" (click)="solicitarEdicao(plano)">Editar</button>
-              <button type="button" class="botao" (click)="solicitarExclusao(plano)">Excluir</button>
-            </td>
-          </tr>
-        }
-      </tbody>
-    </table>
+    <!-- Cards de métricas -->
+    <section class="metricas" aria-label="Métricas de planos">
+      <app-card-metrica titulo="Total de planos" [valor]="totalPlanos()" descricao="Planos ativos no sistema" />
+      <app-card-metrica titulo="Total de beneficiários" [valor]="totalBeneficiarios()" descricao="Vínculos ativos em todos os planos" />
+      <app-card-metrica titulo="Plano mais popular" [valor]="planoMaisPopular()" descricao="Maior número de beneficiários" />
+    </section>
+
+    <!-- Filtros -->
+    <div class="filtros">
+      <label class="campo-busca">
+        <span>Buscar por nome</span>
+        <input type="search" placeholder="Nome do plano" [value]="termoBusca()" (input)="atualizarBusca($event)" />
+      </label>
+      <label class="campo-busca">
+        <span>Código ANS</span>
+        <input type="search" placeholder="Código ANS" [value]="filtroCodigoAns()" (input)="atualizarFiltroCodigo($event)" />
+      </label>
+    </div>
+
+    @if (planosFiltrados().length === 0) {
+      <p class="aviso">Nenhum plano encontrado com os filtros atuais.</p>
+    } @else {
+      <!-- Gráfico de distribuição -->
+      <section class="painel-distribuicao" aria-label="Distribuição dos planos">
+        <div class="cabecalho-distribuicao">
+          <div>
+            <h3>Distribuição de beneficiários por plano</h3>
+            <p>Visualize a proporção de beneficiários em cada plano de saúde.</p>
+          </div>
+          <app-seletor-visualizacao [valor]="visualizacao()" (valorChange)="mudarVisualizacao($event)" />
+        </div>
+        <div class="grafico-pizza">
+          <app-grafico-rosca titulo="Beneficiários por plano" [rotulos]="rotulosPorPlano()" [valores]="valoresPorPlano()" [cores]="coresPorPlano()" />
+        </div>
+      </section>
+
+      <!-- Visualizações alternativas -->
+      @if (visualizacao() === 'tabela') {
+        <table>
+          <thead>
+            <tr>
+              <th>Nome</th>
+              <th>Código ANS</th>
+              <th>Beneficiários</th>
+              <th class="coluna-acoes">Ações</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (plano of planosFiltrados(); track plano.id) {
+              <tr>
+                <td>{{ plano.nome }}</td>
+                <td>{{ plano.codigo_registro_ans }}</td>
+                <td>{{ beneficiariosPorPlano().get(plano.id) || 0 }}</td>
+                <td class="coluna-acoes">
+                  <button type="button" class="botao" (click)="solicitarEdicao(plano)">Editar</button>
+                  <button type="button" class="botao" (click)="solicitarExclusao(plano)">Excluir</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      } @else if (visualizacao() === 'grade') {
+        <div class="grade-planos">
+          @for (plano of planosFiltrados(); track plano.id) {
+            <article class="cartao-plano">
+              <div class="cartao-plano-topo">
+                <strong>{{ plano.nome }}</strong>
+                <span class="codigo-ans">{{ plano.codigo_registro_ans }}</span>
+              </div>
+              <dl>
+                <div>
+                  <dt>Beneficiários</dt>
+                  <dd>{{ beneficiariosPorPlano().get(plano.id) || 0 }}</dd>
+                </div>
+              </dl>
+              <div class="acoes-cartao">
+                <button type="button" (click)="solicitarEdicao(plano)">Editar</button>
+                <button type="button" (click)="solicitarExclusao(plano)">Excluir</button>
+              </div>
+            </article>
+          }
+        </div>
+      } @else if (visualizacao() === 'kanban') {
+        <div class="kanban-planos">
+          <section class="coluna-kanban">
+            <h3>Todos os planos</h3>
+            <small>Arraste para reorganizar (visualização apenas)</small>
+            @for (plano of planosFiltrados(); track plano.id) {
+              <article class="cartao-kanban">
+                <strong>{{ plano.nome }}</strong>
+                <span>{{ plano.codigo_registro_ans }}</span>
+                <span>{{ beneficiariosPorPlano().get(plano.id) || 0 }} beneficiários</span>
+                <button type="button" (click)="solicitarEdicao(plano)">Editar</button>
+              </article>
+            }
+          </section>
+        </div>
+      }
+    }
   }
 </section>
 
