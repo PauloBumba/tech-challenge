@@ -14,8 +14,6 @@ TestResults/
 # Ambiente
 .env
 .env.local
-.env.*
-!.env.example
 *.pfx
 
 # Editores
@@ -28,13 +26,6 @@ TestResults/
 .DS_Store
 Thumbs.db
 
-# Claude / IA
 .claude/
+# Artefatos de ferramenta local
 .playwright-mcp/
-
-# Processo interno de trabalho / uso de IA
-# Nunca rastrear no Git
-/governance/
-/CLAUDE.md
-/.githooks/
-/.opencode/
