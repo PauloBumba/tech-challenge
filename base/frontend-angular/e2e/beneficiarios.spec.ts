@@ -28,25 +28,26 @@ function gerarCpfValido(): string {
 
 test('fluxo completo de beneficiário (cadastro, erro, filtro, edição, exclusão)', async ({ page }) => {
   const cpf = gerarCpfValido();
+  const nome = `${NOME} ${Date.now()}`;
 
-  await page.goto(WEB);
+  await page.goto(`${WEB}/beneficiarios`);
 
   await expect(page.getByRole('heading', { name: 'Beneficiários', exact: true })).toBeVisible();
 
   // 1. Cadastro
   const form = page.locator('form.formulario');
   await page.getByRole('button', { name: 'Novo beneficiário' }).click();
-  await form.getByLabel('Nome completo').fill(NOME);
+  await form.getByLabel('Nome completo').fill(nome);
   await form.getByLabel('CPF').fill(cpf);
   await form.getByLabel('Data de nascimento').fill('1995-03-10');
   await form.getByLabel('Plano').selectOption(PLANO_ID);
   await page.getByRole('button', { name: 'Cadastrar' }).click();
 
-  await expect(page.getByText(NOME)).toBeVisible();
+  await expect(page.getByText(nome)).toBeVisible();
 
   // 2. CPF duplicado vira mensagem de erro na tela (SPEC 9.5)
   await page.getByRole('button', { name: 'Novo beneficiário' }).click();
-  await form.getByLabel('Nome completo').fill(`${NOME} Duplicado`);
+  await form.getByLabel('Nome completo').fill(`${nome} Duplicado`);
   await form.getByLabel('CPF').fill(cpf);
   await form.getByLabel('Data de nascimento').fill('1995-03-10');
   await form.getByLabel('Plano').selectOption(PLANO_ID);
@@ -57,21 +58,24 @@ test('fluxo completo de beneficiário (cadastro, erro, filtro, edição, exclus�
 
   // 3. Filtro por situação reflete a API (não esvazia a tela)
   await page.getByLabel('Situação').selectOption('ATIVO');
-  await expect(page.getByText(NOME)).toBeVisible();
+  await expect(page.getByText(nome)).toBeVisible();
   await page.getByLabel('Situação').selectOption('');
-  await expect(page.getByText(NOME)).toBeVisible();
+  await expect(page.getByText(nome)).toBeVisible();
 
   // 4. Edição
-  await page.getByRole('button', { name: 'Editar' }).click();
+  await page.getByRole('row', { name: new RegExp(nome) }).getByRole('link', { name: 'Editar' }).click();
   const cpfField = form.getByLabel('CPF');
   await expect(cpfField).toBeDisabled();
-  await form.getByLabel('Nome completo').fill(`${NOME} Editado`);
+  await form.getByLabel('Nome completo').fill(`${nome} Editado`);
   await page.getByRole('button', { name: 'Salvar' }).click();
 
-  await expect(page.getByText(`${NOME} Editado`)).toBeVisible();
+  await expect(page.getByText(`${nome} Editado`)).toBeVisible();
 
   // 5. Exclusão só some após sucesso do DELETE
-  page.once('dialog', (dialog) => dialog.accept());
-  await page.getByRole('button', { name: 'Excluir' }).click();
-  await expect(page.getByText(`${NOME} Editado`)).toBeHidden();
+  await page
+    .getByRole('row', { name: new RegExp(`${nome} Editado`) })
+    .getByRole('button', { name: 'Excluir' })
+    .click();
+  await page.getByRole('button', { name: 'Excluir beneficiário' }).click();
+  await expect(page.getByRole('row', { name: new RegExp(`${nome} Editado`) })).toBeHidden();
 });
