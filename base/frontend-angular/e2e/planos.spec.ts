@@ -32,10 +32,11 @@ test('fluxo completo de plano (cadastro, erro, filtro, edição, exclusão)', as
   await page.getByRole('button', { name: 'Cadastrar' }).click();
 
   await expect(page.getByText(/já existe plano/i)).toBeVisible();
-  await page.getByRole('button', { name: 'Cancelar' }).click();
+  await form.getByRole('button', { name: 'Cancelar' }).click();
+  await expect(form).toBeHidden();
 
-  // 3. Filtro por nome reflete a lista
-  const busca = page.getByPlaceholder('Nome do plano');
+  // 3. Filtro por nome reflete a lista (único searchbox na página)
+  const busca = page.getByRole('searchbox', { name: 'Buscar por nome' });
   await busca.fill(nome);
   await expect(page.getByText(nome)).toBeVisible();
   await busca.fill('Plano que não existe 98765');
