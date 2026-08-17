@@ -1,0 +1,54 @@
+<form class="formulario" [formGroup]="formulario" (ngSubmit)="salvar()">
+  <header class="cabecalho">
+    <h3>{{ plano ? 'Editar plano' : 'Novo plano' }}</h3>
+    <button type="button" class="botao-fechar" (click)="cancelado.emit()" aria-label="Fechar">
+      ×
+    </button>
+  </header>
+
+  @if (erro()) {
+    <p class="aviso erro">{{ erro() }}</p>
+  }
+
+  <div class="campos">
+    <label
+      class="campo"
+      [class.invalido]="formulario.controls.nome.invalid && formulario.controls.nome.touched"
+    >
+      <span>Nome do plano</span>
+      <input
+        formControlName="nome"
+        type="text"
+        maxlength="60"
+        placeholder="Nome do plano"
+      />
+      @if (formulario.controls.nome.invalid && formulario.controls.nome.touched) {
+        <small>Informe o nome do plano (mínimo 3 caracteres).</small>
+      }
+    </label>
+
+    <label
+      class="campo"
+      [class.invalido]="formulario.controls.codigo_registro_ans.invalid && formulario.controls.codigo_registro_ans.touched"
+    >
+      <span>Código ANS</span>
+      <input
+        formControlName="codigo_registro_ans"
+        type="text"
+        inputmode="numeric"
+        maxlength="6"
+        placeholder="000000"
+      />
+      @if (formulario.controls.codigo_registro_ans.invalid && formulario.controls.codigo_registro_ans.touched) {
+        <small>Informe o código ANS (exatamente 6 dígitos).</small>
+      }
+    </label>
+  </div>
+
+  <footer class="acoes">
+    <button type="button" class="botao" (click)="cancelado.emit()">Cancelar</button>
+    <button type="submit" class="botao primario" [disabled]="enviando()">
+      {{ enviando() ? 'Salvando...' : (plano ? 'Salvar' : 'Cadastrar') }}
+    </button>
+  </footer>
+</form>
