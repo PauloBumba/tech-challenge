@@ -1,0 +1,105 @@
+.container-notificacoes {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  max-width: 28rem;
+  pointer-events: none;
+}
+
+.notificacao {
+  pointer-events: auto;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 8px;
+  background: #fff;
+  box-shadow: 0 4px 12px rgb(16 24 40 / 0.15);
+  animation: deslizarDireita 0.3s ease-out;
+  border-left: 4px solid;
+}
+
+@keyframes deslizarDireita {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.notificacao.sucesso {
+  border-left-color: #0f766e;
+}
+
+.notificacao.erro {
+  border-left-color: #b42318;
+}
+
+.notificacao.info {
+  border-left-color: #1d4ed8;
+}
+
+.notificacao .icone {
+  display: grid;
+  place-items: center;
+  width: 1.4rem;
+  height: 1.4rem;
+  border-radius: 50%;
+  font-weight: 700;
+  font-size: 0.9rem;
+  flex-shrink: 0;
+}
+
+.notificacao.sucesso .icone {
+  background: #ecfdf5;
+  color: #0f766e;
+}
+
+.notificacao.erro .icone {
+  background: #fef3f2;
+  color: #b42318;
+}
+
+.notificacao.info .icone {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.notificacao .mensagem {
+  flex: 1;
+  font-size: 0.9rem;
+  color: #374151;
+  line-height: 1.4;
+}
+
+.notificacao .botao-fechar {
+  border: none;
+  background: transparent;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 0.2rem 0.4rem;
+  border-radius: 4px;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.notificacao .botao-fechar:hover {
+  background: #f3f4f6;
+  color: #111827;
+}
+
+@media (max-width: 480px) {
+  .container-notificacoes {
+    left: 1rem;
+    right: 1rem;
+    max-width: none;
+  }
+}

@@ -1,13 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-import { BeneficiarioLista } from './beneficiarios/beneficiario-lista';
 import { StatusDaApi } from './nucleo/status-da-api';
-import { PlanosLista } from './planos/planos-lista';
+import { NotificacaoToast } from './compartilhado/notificacao-toast';
 
 @Component({
   selector: 'app-root',
-  imports: [PlanosLista, BeneficiarioLista, StatusDaApi],
+  imports: [RouterLink, RouterLinkActive, RouterOutlet, StatusDaApi, NotificacaoToast],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
-export class App {}
+export class App {
+  protected readonly menuAberto = signal(false);
+
+  protected alternarMenu(): void {
+    this.menuAberto.update((aberto) => !aberto);
+  }
+
+  protected fecharMenu(): void {
+    this.menuAberto.set(false);
+  }
+}
