@@ -17,10 +17,10 @@ builder.Services.AddApi();
 
 var app = builder.Build();
 
-// Métricas por fora do tratamento de erro para registrar o status final (404/409/500 incluso).
+// Métricas e log por fora do tratamento de erro para registrar o status final (404/409/500 incluso).
 app.UseMiddleware<MetricasMiddleware>();
-app.UseMiddleware<TratamentoDeErroMiddleware>();
 app.UseMiddleware<RegistroDeRequisicaoMiddleware>();
+app.UseMiddleware<TratamentoDeErroMiddleware>();
 
 app.UseCors(DependenciasDaApi.PoliticaDaWeb);
 

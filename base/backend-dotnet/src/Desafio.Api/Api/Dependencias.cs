@@ -1,4 +1,5 @@
 using Desafio.Api.Api.Contratos;
+using Desafio.Api.Api.Observabilidade;
 using Desafio.Api.Dominio.Excecoes;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,6 +11,9 @@ public static class DependenciasDaApi
 
     public static IServiceCollection AddApi(this IServiceCollection servicos)
     {
+        // Estado compartilhado de métricas e logs em memória; vive enquanto a aplicação viver.
+        servicos.AddSingleton<ObservabilidadeServico>();
+
         // A interface web roda em outra origem (porta 4200) e o navegador bloqueia a chamada sem isto.
         servicos.AddCors(opcoes => opcoes.AddPolicy(
             PoliticaDaWeb,

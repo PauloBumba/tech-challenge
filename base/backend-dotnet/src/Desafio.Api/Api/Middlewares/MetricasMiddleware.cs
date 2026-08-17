@@ -9,7 +9,9 @@ namespace Desafio.Api.Api.Middlewares;
 /// id concreto) e status. Roda por fora do TratamentoDeErroMiddleware de propósito: assim o
 /// status registrado é o final (inclusive 404/409/500 que o tratamento converte).
 /// </summary>
-public class MetricasMiddleware(RequestDelegate proximo)
+public class MetricasMiddleware(
+    RequestDelegate proximo,
+    ObservabilidadeServico observabilidade)
 {
     public async Task InvokeAsync(HttpContext contexto)
     {
@@ -23,7 +25,7 @@ public class MetricasMiddleware(RequestDelegate proximo)
         {
             cronometro.Stop();
 
-            MetricasDeRequisicao.Registrar(
+            observabilidade.Registrar(
                 contexto.Request.Method,
                 ObterRota(contexto),
                 contexto.Response.StatusCode,

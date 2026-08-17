@@ -72,4 +72,44 @@ public class ObservabilidadeTests(ApiFixture fixture) : IAsyncLifetime
 
         Assert.Contains("http_requisicoes_total{metodo=\"GET\",rota=\"/beneficiarios/{id:guid}\",status=\"404\"} 1", corpo);
     }
+
+    [Fact]
+    public async Task Logs_deve_devolver_200_com_json_de_requisicoes()
+    {
+        await Client.GetAsync("/health");
+
+        var resposta = await Client.GetAsync("/logs");
+
+        Assert.Equal(HttpStatusCode.OK, resposta.StatusCode);
+        Assert.Equal("application/json", resposta.Content.Headers.ContentType?.MediaType);
+
+        var logs = await resposta.Content.ReadAsStringAsync();
+        Assert.Contains("metodo", logs);
+        Assert.Contains("rota", logs);
+        Assert.Contains("/health", logs);
+        Assert.Contains("status", logs);
+    }
+
+    [Fact]
+    public async Task Logs_deve_registrar_o_status_final_de_erro()
+    {
+        await Client.GetAsync($"/beneficiarios/{Guid.NewGuid()}");
+
+        var logs = await (await Client.GetAsync("/logs")).Content.ReadAsStringAsync();
+
+        Assert.Contains("\"rota\":\"/beneficiarios/{id:guid}\"", logs);
+        Assert.Contains("\"status\":404", logs);
+    }
+
+    [Fact]
+    public async Task Logs_deve_listar_do_mais_recente_para_o_mais_antigo()
+    {
+        await Client.GetAsync("/health");
+        await Client.GetAsync("/health");
+
+        var logs = await (await Client.GetAsync("/logs")).Content.ReadAsStringAsync();
+
+        Assert.StartsWith("[", logs.Trim());
+        Assert.Contains("\"momento\":\"2026", logs);
+    }
 }

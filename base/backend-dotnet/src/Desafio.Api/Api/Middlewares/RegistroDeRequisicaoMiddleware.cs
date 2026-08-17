@@ -1,3 +1,4 @@
+using Desafio.Api.Api.Observabilidade;
 using Microsoft.AspNetCore.Routing;
 
 namespace Desafio.Api.Api.Middlewares;
@@ -7,7 +8,10 @@ namespace Desafio.Api.Api.Middlewares;
 /// de string na mensagem — os valores são passados como campos do template de log, que o
 /// AddJsonConsole do Program.cs serializa como JSON estruturado.
 /// </summary>
-public class RegistroDeRequisicaoMiddleware(RequestDelegate proximo, ILogger<RegistroDeRequisicaoMiddleware> logger)
+public class RegistroDeRequisicaoMiddleware(
+    RequestDelegate proximo,
+    ILogger<RegistroDeRequisicaoMiddleware> logger,
+    ObservabilidadeServico observabilidade)
 {
     public async Task InvokeAsync(HttpContext contexto)
     {
@@ -21,12 +25,23 @@ public class RegistroDeRequisicaoMiddleware(RequestDelegate proximo, ILogger<Reg
         {
             cronometro.Stop();
 
+            var rota = ObterRota(contexto);
+            var status = contexto.Response.StatusCode;
+            var duracao = cronometro.Elapsed.TotalMilliseconds;
+
             logger.LogInformation(
                 "Requisição concluída. Método: {Metodo}. Rota: {Rota}. Status: {Status}. DuraçãoMs: {DuracaoMs}",
                 contexto.Request.Method,
-                ObterRota(contexto),
-                contexto.Response.StatusCode,
-                cronometro.Elapsed.TotalMilliseconds);
+                rota,
+                status,
+                duracao);
+
+            observabilidade.RegistrarLog(new RegistroDeRequisicaoLog(
+                DateTime.UtcNow,
+                contexto.Request.Method,
+                rota,
+                status,
+                duracao));
         }
     }
 

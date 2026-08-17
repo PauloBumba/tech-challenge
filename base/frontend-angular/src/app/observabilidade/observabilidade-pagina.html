@@ -12,15 +12,15 @@
   } @else if (erro()) {
     <p class="aviso erro">{{ erro() }}</p>
   } @else {
-    <section class="resumo" aria-label="Saúde dos serviços">
-      <article><span>API</span><strong>{{ apiOnline() ? 'Online' : 'Indisponível' }}</strong></article>
-      <article><span>Banco PostgreSQL</span><strong>{{ bancoOnline() ? 'Online' : 'Indisponível' }}</strong></article>
-      <article><span>Frontend</span><strong>Online</strong></article>
+    <section class="resumo-saude" aria-label="Saúde dos serviços">
+      <app-indicador-status nome="API" [online]="apiOnline()" tipo="api" />
+      <app-indicador-status nome="Banco PostgreSQL" [online]="bancoOnline()" tipo="banco" />
+      <app-indicador-status nome="Frontend" [online]="true" tipo="frontend" />
     </section>
     <div class="resumo">
-      <article><span>Requisições</span><strong>{{ totalDeRequisicoes() }}</strong></article>
-      <article><span>Erros (4xx/5xx)</span><strong>{{ totalDeErros() }}</strong></article>
-      <article><span>Rotas observadas</span><strong>{{ metricas().length }}</strong></article>
+      <article><span class="com-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 3v18h18M7 16v-5M12 16V7M17 16v-8"/></svg>Requisições</span><strong>{{ totalDeRequisicoes() }}</strong></article>
+      <article><span class="com-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0ZM12 9v4M12 17h.01"/></svg>Erros (4xx/5xx)</span><strong>{{ totalDeErros() }}</strong></article>
+      <article><span class="com-icone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12a9 9 0 1 1-9-9M21 3v6h-6"/></svg>Rotas observadas</span><strong>{{ metricas().length }}</strong></article>
     </div>
 
     @if (metricas().length === 0) {
@@ -38,4 +38,52 @@
     }
     @if (atualizadoEm(); as data) { <p class="atualizacao">Atualizado às {{ data | date:'HH:mm:ss' }} · renovação automática a cada 15 s.</p> }
   }
+
+  <section class="painel-logs" aria-label="Logs de requisição">
+    <header class="cabecalho-logs">
+      <div>
+        <h3>Logs de requisição</h3>
+        <p>Requisições registradas pela API, da mais recente para a mais antiga (últimas 50).</p>
+      </div>
+      <div class="filtros-logs">
+        <label class="campo-busca">
+          <span>Filtrar rota</span>
+          <input type="search" placeholder="ex.: /beneficiarios" [value]="termoDeRota()" (input)="atualizarTermoDeRota($event)" />
+        </label>
+        <div class="filtros-status">
+          <button type="button" class="botao" [class.ativo]="filtroDeLog() === 'todos'" (click)="mudarFiltroDeLog('todos')">Todos</button>
+          <button type="button" class="botao" [class.ativo]="filtroDeLog() === 'sucesso'" (click)="mudarFiltroDeLog('sucesso')">Sucesso</button>
+          <button type="button" class="botao" [class.ativo]="filtroDeLog() === 'erro'" (click)="mudarFiltroDeLog('erro')">Erros</button>
+        </div>
+        <button type="button" class="botao limpar" (click)="limparLogs()" [disabled]="logs().length === 0">Limpar</button>
+      </div>
+    </header>
+
+    @if (logsFiltrados().length === 0) {
+      <p class="aviso">Nenhum log corresponde aos filtros atuais. Use o sistema e atualize esta página.</p>
+    } @else {
+      <table class="tabela-logs">
+        <thead>
+          <tr>
+            <th>Momento</th>
+            <th>Método</th>
+            <th>Rota</th>
+            <th>Status</th>
+            <th>Duração</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (log of logsFiltrados(); track log.momento + log.metodo + log.rota) {
+            <tr>
+              <td class="celula-momento">{{ log.momento | date:'dd/MM/yy HH:mm:ss' }}</td>
+              <td><span class="metodo">{{ log.metodo }}</span></td>
+              <td><code class="rota">{{ log.rota }}</code></td>
+              <td><span class="status" [class]="classeDeStatus(log.status)">{{ log.status }}</span></td>
+              <td class="celula-duracao">{{ log.duracao_milissegundos | number:'1.0-0' }} ms</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+    }
+  </section>
 </section>

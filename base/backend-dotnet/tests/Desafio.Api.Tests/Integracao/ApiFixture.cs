@@ -76,7 +76,11 @@ public sealed class ApiFixture : IAsyncLifetime
             await db.Database.ExecuteSqlRawAsync("""UPDATE "Planos" SET "ExcluidoEm" = NULL;""");
         });
 
-        MetricasDeRequisicao.Limpar();
+        using (var escopo = _fabrica.Services.CreateScope())
+        {
+            var observabilidade = escopo.ServiceProvider.GetRequiredService<ObservabilidadeServico>();
+            observabilidade.Limpar();
+        }
     }
 
     /// <summary>

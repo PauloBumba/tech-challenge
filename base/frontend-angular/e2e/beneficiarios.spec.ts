@@ -63,7 +63,7 @@ test('fluxo completo de beneficiário (cadastro, erro, filtro, edição, exclus�
   await expect(page.getByText(nome)).toBeVisible();
 
   // 4. Edição
-  await page.getByRole('row', { name: new RegExp(nome) }).getByRole('link', { name: 'Editar' }).click();
+  await page.getByRole('row', { name: new RegExp(nome) }).getByRole('button', { name: 'Editar' }).click();
   const cpfField = form.getByLabel('CPF');
   await expect(cpfField).toBeDisabled();
   await form.getByLabel('Nome completo').fill(`${nome} Editado`);

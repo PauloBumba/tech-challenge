@@ -6,19 +6,17 @@ using System.Text;
 namespace Desafio.Api.Api.Observabilidade;
 
 /// <summary>
-/// Registro em memória das métricas de requisição HTTP, exposto em formato Prometheus.
+/// Estado de observabilidade da API, registrado como singleton no DI: métricas de
+/// requisição HTTP (System.Diagnostics.Metrics) e um buffer circular com os últimos
+/// logs estruturados de requisição, expostos em /metrics e /logs.
 ///
-/// Os instrumentos (Counter/Histogram) usam System.Diagnostics.Metrics — a API nativa do .NET —
-/// sem dependência externa. O endpoint /metrics serializa o estado em texto Prometheus para
-/// consumo direto por um scraper (Prometheus, Grafana etc.).
-///
-/// A chave é "metodo|rota|status" porque é a dimensão que o teste público/eval usa: contar por
-/// rota e status. O estado em memória é intencional (single instance, dev/desafio): não há
-/// necessidade de persistência.
+/// O estado em memória é intencional (single instance, dev/desafio): não há necessidade
+/// de persistência.
 /// </summary>
-public static class MetricasDeRequisicao
+public sealed class ObservabilidadeServico
 {
     private const string NomeDoMeter = "desafio.api";
+    private const int CapacidadeDeLogs = 200;
 
     private static readonly Meter Meter = new(NomeDoMeter, "1.0.0");
 
@@ -31,22 +29,25 @@ public static class MetricasDeRequisicao
         unit: "ms",
         description: "Duração das requisições HTTP em milissegundos");
 
-    private static readonly ConcurrentDictionary<string, long> ContagemPorChave = new();
+    private readonly ConcurrentDictionary<string, long> _contagemPorChave = new();
+    private readonly ConcurrentDictionary<string, double> _duracaoTotalPorChave = new();
+    private readonly ConcurrentDictionary<string, long[]> _histogramaPorChave = new();
 
-    private static readonly ConcurrentDictionary<string, double> DuracaoTotalPorChave = new();
-
-    private static readonly ConcurrentDictionary<string, long[]> HistogramaPorChave = new();
+    private readonly ConcurrentQueue<RegistroDeRequisicaoLog> _logs = new();
 
     private static readonly double[] Buckets = [1, 5, 10, 50, 100, 250, 500, 1000, 2500, 5000];
 
-    public static void Registrar(string metodo, string rota, int status, double duracaoEmMilissegundos)
+    // A chave é "metodo|rota|status" porque é a dimensão que o teste público/eval usa: contar por
+    // rota e status. A rota é o template ("beneficiarios/{id:guid}"), nunca o path com o id
+    // concreto, para não explodir a cardinalidade de séries no scraper.
+    public void Registrar(string metodo, string rota, int status, double duracaoEmMilissegundos)
     {
         var chave = $"{metodo}|{rota}|{status}";
 
-        ContagemPorChave.AddOrUpdate(chave, 1, (_, atual) => atual + 1);
-        DuracaoTotalPorChave.AddOrUpdate(chave, duracaoEmMilissegundos, (_, atual) => atual + duracaoEmMilissegundos);
+        _contagemPorChave.AddOrUpdate(chave, 1, (_, atual) => atual + 1);
+        _duracaoTotalPorChave.AddOrUpdate(chave, duracaoEmMilissegundos, (_, atual) => atual + duracaoEmMilissegundos);
 
-        HistogramaPorChave.AddOrUpdate(
+        _histogramaPorChave.AddOrUpdate(
             chave,
             _ => PreencherBuckets(duracaoEmMilissegundos),
             (_, atual) => IncrementarBuckets(atual, duracaoEmMilissegundos));
@@ -62,20 +63,44 @@ public static class MetricasDeRequisicao
         DuracaoMilissegundos.Record(duracaoEmMilissegundos, dimensoes);
     }
 
-    public static void Limpar()
+    public void RegistrarLog(RegistroDeRequisicaoLog log)
     {
-        ContagemPorChave.Clear();
-        DuracaoTotalPorChave.Clear();
-        HistogramaPorChave.Clear();
+        _logs.Enqueue(log);
+
+        while (_logs.Count > CapacidadeDeLogs)
+        {
+            _logs.TryDequeue(out _);
+        }
     }
 
-    public static string SerializarPrometheus()
+    public IReadOnlyList<RegistroDeRequisicaoLog> ListarLogs(int limite) =>
+        _logs.Reverse().Take(limite).ToList();
+
+    public void LimparLogs()
+    {
+        while (_logs.TryDequeue(out _))
+        {
+        }
+    }
+
+    public void Limpar()
+    {
+        _contagemPorChave.Clear();
+        _duracaoTotalPorChave.Clear();
+        _histogramaPorChave.Clear();
+
+        while (_logs.TryDequeue(out _))
+        {
+        }
+    }
+
+    public string SerializarPrometheus()
     {
         var texto = new StringBuilder();
 
         texto.AppendLine("# HELP http_requisicoes_total Número total de requisições HTTP recebidas");
         texto.AppendLine("# TYPE http_requisicoes_total counter");
-        foreach (var (chave, valor) in ContagemPorChave.OrderBy(par => par.Key))
+        foreach (var (chave, valor) in _contagemPorChave.OrderBy(par => par.Key))
         {
             var (metodo, rota, status) = SepararChave(chave);
             texto.AppendLine(
@@ -84,7 +109,7 @@ public static class MetricasDeRequisicao
 
         texto.AppendLine("# HELP http_requisicao_duracao_milissegundos Duração das requisições HTTP em milissegundos");
         texto.AppendLine("# TYPE http_requisicao_duracao_milissegundos histogram");
-        foreach (var (chave, buckets) in HistogramaPorChave.OrderBy(par => par.Key))
+        foreach (var (chave, buckets) in _histogramaPorChave.OrderBy(par => par.Key))
         {
             var (metodo, rota, status) = SepararChave(chave);
             var labels = $"metodo=\"{metodo}\",rota=\"{rota}\",status=\"{status}\"";
@@ -100,8 +125,8 @@ public static class MetricasDeRequisicao
             acumulado += buckets[Buckets.Length];
             texto.AppendLine($"http_requisicao_duracao_milissegundos_bucket{{{labels},le=\"+Inf\"}} {acumulado}");
             texto.AppendLine(
-                $"http_requisicao_duracao_milissegundos_sum{{{labels}}} {DuracaoTotalPorChave[chave]:F3}");
-            texto.AppendLine($"http_requisicao_duracao_milissegundos_count{{{labels}}} {ContagemPorChave[chave]}");
+                $"http_requisicao_duracao_milissegundos_sum{{{labels}}} {_duracaoTotalPorChave[chave]:F3}");
+            texto.AppendLine($"http_requisicao_duracao_milissegundos_count{{{labels}}} {_contagemPorChave[chave]}");
         }
 
         return texto.ToString();
