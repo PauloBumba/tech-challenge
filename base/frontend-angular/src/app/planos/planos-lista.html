@@ -1,11 +1,11 @@
 <section class="cartao">
   <header class="cabecalho">
-    <h2>Planos</h2>
-    <button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">Recarregar</button>
+    <div><p class="sobretitulo">Gestão assistencial</p><h2>Planos</h2><span>Configure e gerencie os planos de saúde disponíveis.</span></div>
+    <div class="acoes-principais"><button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">↻ Recarregar</button><button type="button" class="botao primario" (click)="modalNovoAberto.set(true)">+ Novo plano</button></div>
   </header>
 
   @if (carregando()) {
-    <p class="aviso">Carregando planos...</p>
+    <app-indicador-carregamento mensagem="Carregando planos..." />
   } @else if (erro()) {
     <p class="aviso erro">{{ erro() }}</p>
   } @else if (planos().length === 0) {
@@ -16,6 +16,7 @@
         <tr>
           <th>Nome</th>
           <th>Código ANS</th>
+          <th class="coluna-acoes">Ações</th>
         </tr>
       </thead>
       <tbody>
@@ -23,9 +24,27 @@
           <tr>
             <td>{{ plano.nome }}</td>
             <td>{{ plano.codigo_registro_ans }}</td>
+            <td class="coluna-acoes">
+              <button type="button" class="botao" (click)="solicitarEdicao(plano)">Editar</button>
+              <button type="button" class="botao" (click)="solicitarExclusao(plano)">Excluir</button>
+            </td>
           </tr>
         }
       </tbody>
     </table>
   }
 </section>
+
+@if (modalNovoAberto()) {
+  <div class="sobreposicao" role="presentation" (click)="modalNovoAberto.set(false)">
+    <section class="modal" role="dialog" aria-modal="true" aria-label="Novo plano" (click)="$event.stopPropagation()"><app-plano-formulario (salvo)="modalNovoAberto.set(false); carregar()" (cancelado)="modalNovoAberto.set(false)" /></section>
+  </div>
+}
+@if (modalEdicaoAberto()) {
+  <div class="sobreposicao" role="presentation" (click)="modalEdicaoAberto.set(false)">
+    <section class="modal" role="dialog" aria-modal="true" aria-label="Editar plano" (click)="$event.stopPropagation()"><app-plano-formulario [plano]="planoParaEditar()" (salvo)="modalEdicaoAberto.set(false); carregar()" (cancelado)="modalEdicaoAberto.set(false)" /></section>
+  </div>
+}
+@if (planoParaExcluir(); as plano) {
+  <div class="sobreposicao" role="presentation"><section class="dialogo-confirmacao" role="alertdialog" aria-modal="true" aria-labelledby="titulo-exclusao"><div class="icone-alerta">!</div><div><h3 id="titulo-exclusao">Excluir plano?</h3><p>Você está prestes a excluir <strong>{{ plano.nome }}</strong>. Esta ação remove o plano da lista, mas preserva o vínculo dos beneficiários já cadastrados.</p></div><footer><button type="button" class="botao" (click)="planoParaExcluir.set(null)">Cancelar</button><button type="button" class="botao perigo" (click)="confirmarExclusao()">Excluir plano</button></footer></section></div>
+}
