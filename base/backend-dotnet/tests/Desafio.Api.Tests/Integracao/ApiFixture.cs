@@ -1,3 +1,4 @@
+using Desafio.Api.Api.Observabilidade;
 using Desafio.Api.Dominio;
 using Desafio.Api.Infraestrutura.Persistence;
 using Microsoft.AspNetCore.Hosting;
@@ -74,6 +75,8 @@ public sealed class ApiFixture : IAsyncLifetime
             await db.Database.ExecuteSqlRawAsync(ApagarPlanosCriadosPelosTestes);
             await db.Database.ExecuteSqlRawAsync("""UPDATE "Planos" SET "ExcluidoEm" = NULL;""");
         });
+
+        MetricasDeRequisicao.Limpar();
     }
 
     /// <summary>
