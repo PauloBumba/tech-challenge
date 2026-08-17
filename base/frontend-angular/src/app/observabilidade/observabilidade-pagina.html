@@ -1,0 +1,41 @@
+<section class="observabilidade">
+  <header class="cabecalho">
+    <div>
+      <h2>Observabilidade</h2>
+      <p>Contadores de requisição fornecidos pela API.</p>
+    </div>
+    <button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">Atualizar</button>
+  </header>
+
+  @if (carregando()) {
+    <app-indicador-carregamento mensagem="Carregando métricas..." />
+  } @else if (erro()) {
+    <p class="aviso erro">{{ erro() }}</p>
+  } @else {
+    <section class="resumo" aria-label="Saúde dos serviços">
+      <article><span>API</span><strong>{{ apiOnline() ? 'Online' : 'Indisponível' }}</strong></article>
+      <article><span>Banco PostgreSQL</span><strong>{{ bancoOnline() ? 'Online' : 'Indisponível' }}</strong></article>
+      <article><span>Frontend</span><strong>Online</strong></article>
+    </section>
+    <div class="resumo">
+      <article><span>Requisições</span><strong>{{ totalDeRequisicoes() }}</strong></article>
+      <article><span>Erros (4xx/5xx)</span><strong>{{ totalDeErros() }}</strong></article>
+      <article><span>Rotas observadas</span><strong>{{ metricas().length }}</strong></article>
+    </div>
+
+    @if (metricas().length === 0) {
+      <p class="aviso">Ainda não há requisições registradas. Use o sistema e atualize esta página.</p>
+    } @else {
+      <div class="grafico" aria-label="Requisições por rota">
+        @for (metrica of metricas(); track metrica.metodo + metrica.rota + metrica.status) {
+          <div class="linha-grafico">
+            <span class="rotulo">{{ metrica.metodo }} {{ metrica.rota }} <em>{{ metrica.status }}</em></span>
+            <div class="trilho"><span class="barra" [style.width.%]="percentual(metrica)"></span></div>
+            <strong>{{ metrica.requisicoes }}</strong>
+          </div>
+        }
+      </div>
+    }
+    @if (atualizadoEm(); as data) { <p class="atualizacao">Atualizado às {{ data | date:'HH:mm:ss' }} · renovação automática a cada 15 s.</p> }
+  }
+</section>
