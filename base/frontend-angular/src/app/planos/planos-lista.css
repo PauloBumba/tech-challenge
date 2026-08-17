@@ -39,6 +39,9 @@
   border-color: #9aa2ae;
 }
 
+.com-icone { display: inline-flex; align-items: center; gap: .4rem; }
+.com-icone svg { width: 1rem; height: 1rem; flex: 0 0 auto; }
+
 .botao:focus-visible {
   outline: 2px solid #1d4ed8;
   outline-offset: 2px;
@@ -109,7 +112,7 @@ th {
   padding: 0.55rem 0.75rem;
 }
 
-.sobreposicao { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem; background: rgb(11 31 51 / .58); backdrop-filter: blur(3px); }.modal { width: min(100%, 48rem); max-height: calc(100dvh - 2rem); overflow: auto; border-radius: .85rem; background: #fff; box-shadow: 0 24px 48px rgb(11 31 51 / .32); }.dialogo-confirmacao { width: min(100%, 28rem); display: grid; grid-template-columns: auto 1fr; gap: 1rem; border-radius: .85rem; background: #fff; padding: 1.5rem; box-shadow: 0 24px 48px rgb(11 31 51 / .32); }.icone-alerta { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #fef3f2; color: #b42318; font-weight: 800; }.dialogo-confirmacao h3 { margin: .2rem 0 .4rem; color: #172033; }.dialogo-confirmacao p { margin: 0; color: #667085; font-size: .9rem; line-height: 1.5; }.dialogo-confirmacao footer { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: .65rem; margin-top: .35rem; }.botao.perigo { color: #fff; background: #b42318; border-color: #b42318; }
+.sobreposicao { position: fixed; inset: 0; z-index: 60; display: grid; place-items: center; padding: 1rem; background: rgb(11 31 51 / .58); backdrop-filter: blur(3px); }.modal { width: min(100%, 48rem); max-height: calc(100dvh - 2rem); overflow: auto; border-radius: .85rem; background: #fff; box-shadow: 0 24px 48px rgb(11 31 51 / .32); }.dialogo-confirmacao { width: min(100%, 28rem); display: grid; grid-template-columns: auto 1fr; gap: 1rem; border-radius: .85rem; background: #fff; padding: 1.5rem; box-shadow: 0 24px 48px rgb(11 31 51 / .32); }.icone-alerta { display: grid; place-items: center; width: 2.5rem; height: 2.5rem; border-radius: 50%; background: #fef3f2; color: #b42318; font-weight: 800; }.icone-alerta svg { width: 1.3rem; height: 1.3rem; }.dialogo-confirmacao h3 { margin: .2rem 0 .4rem; color: #172033; }.dialogo-confirmacao p { margin: 0; color: #667085; font-size: .9rem; line-height: 1.5; }.dialogo-confirmacao footer { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: .65rem; margin-top: .35rem; }.botao.perigo { color: #fff; background: #b42318; border-color: #b42318; }
 
 @media (max-width: 600px) {
   .cartao { padding: 1rem; overflow: hidden; }

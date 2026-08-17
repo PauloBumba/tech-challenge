@@ -1,7 +1,7 @@
 <section class="cartao">
   <header class="cabecalho">
     <div><p class="sobretitulo">Gestão assistencial</p><h2>Planos</h2><span>Configure e gerencie os planos de saúde disponíveis.</span></div>
-    <div class="acoes-principais"><button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">↻ Recarregar</button><button type="button" class="botao primario" (click)="modalNovoAberto.set(true)">+ Novo plano</button></div>
+    <div class="acoes-principais"><button type="button" class="botao com-icone" (click)="carregar()" [disabled]="carregando()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M21 12a9 9 0 1 1-2.64-6.36M21 3v6h-6"/></svg>Recarregar</button><button type="button" class="botao primario com-icone" (click)="modalNovoAberto.set(true)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Novo plano</button></div>
   </header>
 
   @if (carregando()) {
@@ -13,9 +13,9 @@
   } @else {
     <!-- Cards de métricas -->
     <section class="metricas" aria-label="Métricas de planos">
-      <app-card-metrica titulo="Total de planos" [valor]="totalPlanos()" descricao="Planos ativos no sistema" />
-      <app-card-metrica titulo="Total de beneficiários" [valor]="totalBeneficiarios()" descricao="Vínculos ativos em todos os planos" />
-      <app-card-metrica titulo="Plano mais popular" [valor]="planoMaisPopular()" descricao="Maior número de beneficiários" />
+      <app-card-metrica titulo="Total de planos" [valor]="totalPlanos()" descricao="Planos ativos no sistema" icone="<svg class=&quot;size-4&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; aria-hidden=&quot;true&quot;><path d=&quot;M4 19.5V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v15.5M4 19.5A2.5 2.5 0 0 0 6.5 22H20M4 19.5A2.5 2.5 0 0 1 6.5 17H20M8 6h8M8 10h8&quot;/></svg>" iconeCor="ambar" />
+      <app-card-metrica titulo="Total de beneficiários" [valor]="totalBeneficiarios()" descricao="Vínculos ativos em todos os planos" icone="<svg class=&quot;size-4&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; aria-hidden=&quot;true&quot;><path d=&quot;M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8ZM22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75&quot;/></svg>" iconeCor="verde" />
+      <app-card-metrica titulo="Plano mais popular" [valor]="planoMaisPopular()" descricao="Maior número de beneficiários" icone="<svg class=&quot;size-4&quot; viewBox=&quot;0 0 24 24&quot; fill=&quot;none&quot; stroke=&quot;currentColor&quot; stroke-width=&quot;1.8&quot; aria-hidden=&quot;true&quot;><path d=&quot;M11.05 3.11 8.13 8.7l-6.09.9a1 1 0 0 0-.55 1.7l4.4 4.28-1.04 6.05a1 1 0 0 0 1.45 1.06L12 18.9l5.45 2.87a1 1 0 0 0 1.45-1.06l-1.04-6.05 4.4-4.28a1 1 0 0 0-.55-1.7l-6.09-.9-2.92-5.6a1 1 0 0 0-1.65-.07Z&quot;/></svg>" iconeCor="vermelho" />
     </section>
 
     <!-- Filtros -->
@@ -65,8 +65,8 @@
                 <td>{{ plano.codigo_registro_ans }}</td>
                 <td>{{ beneficiariosPorPlano().get(plano.id) || 0 }}</td>
                 <td class="coluna-acoes">
-                  <button type="button" class="botao" (click)="solicitarEdicao(plano)">Editar</button>
-                  <button type="button" class="botao" (click)="solicitarExclusao(plano)">Excluir</button>
+                  <button type="button" class="botao com-icone" (click)="solicitarEdicao(plano)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Editar</button>
+                  <button type="button" class="botao com-icone" (click)="solicitarExclusao(plano)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>Excluir</button>
                 </td>
               </tr>
             }
@@ -87,8 +87,8 @@
                 </div>
               </dl>
               <div class="acoes-cartao">
-                <button type="button" (click)="solicitarEdicao(plano)">Editar</button>
-                <button type="button" (click)="solicitarExclusao(plano)">Excluir</button>
+                <button type="button" class="com-icone" (click)="solicitarEdicao(plano)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Editar</button>
+                <button type="button" class="com-icone" (click)="solicitarExclusao(plano)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>Excluir</button>
               </div>
             </article>
           }
@@ -103,7 +103,7 @@
                 <strong>{{ plano.nome }}</strong>
                 <span>{{ plano.codigo_registro_ans }}</span>
                 <span>{{ beneficiariosPorPlano().get(plano.id) || 0 }} beneficiários</span>
-                <button type="button" (click)="solicitarEdicao(plano)">Editar</button>
+                <button type="button" class="com-icone" (click)="solicitarEdicao(plano)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"/></svg>Editar</button>
               </article>
             }
           </section>
@@ -124,5 +124,5 @@
   </div>
 }
 @if (planoParaExcluir(); as plano) {
-  <div class="sobreposicao" role="presentation"><section class="dialogo-confirmacao" role="alertdialog" aria-modal="true" aria-labelledby="titulo-exclusao"><div class="icone-alerta">!</div><div><h3 id="titulo-exclusao">Excluir plano?</h3><p>Você está prestes a excluir <strong>{{ plano.nome }}</strong>. Esta ação remove o plano da lista, mas preserva o vínculo dos beneficiários já cadastrados.</p></div><footer><button type="button" class="botao" (click)="planoParaExcluir.set(null)">Cancelar</button><button type="button" class="botao perigo" (click)="confirmarExclusao()">Excluir plano</button></footer></section></div>
+  <div class="sobreposicao" role="presentation"><section class="dialogo-confirmacao" role="alertdialog" aria-modal="true" aria-labelledby="titulo-exclusao"><div class="icone-alerta"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0ZM12 9v4M12 17h.01"/></svg></div><div><h3 id="titulo-exclusao">Excluir plano?</h3><p>Você está prestes a excluir <strong>{{ plano.nome }}</strong>. Esta ação remove o plano da lista, mas preserva o vínculo dos beneficiários já cadastrados.</p></div><footer><button type="button" class="botao" (click)="planoParaExcluir.set(null)">Cancelar</button><button type="button" class="botao perigo com-icone" (click)="confirmarExclusao()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6M10 11v6M14 11v6"/></svg>Excluir plano</button></footer></section></div>
 }
