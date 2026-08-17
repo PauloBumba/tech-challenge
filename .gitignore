@@ -28,11 +28,12 @@ TestResults/
 .DS_Store
 Thumbs.db
 
+# Claude / IA
 .claude/
-# Artefatos de ferramenta local
 .playwright-mcp/
 
-# processo interno de trabalho / uso de IA — nunca rastreado, nunca no diff do PR
+# Processo interno de trabalho / uso de IA
+# Nunca rastrear no Git
 /governance/
 /CLAUDE.md
 /.githooks/
