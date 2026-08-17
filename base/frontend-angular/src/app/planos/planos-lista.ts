@@ -3,8 +3,11 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { CardMetrica } from '../compartilhado/card-metrica';
+import { criarDistribuicao } from '../compartilhado/distribuicao';
+import { DialogoDeConfirmacao } from '../compartilhado/dialogo-de-confirmacao';
 import { GraficoRosca } from '../compartilhado/grafico-rosca';
 import { IndicadorCarregamento } from '../compartilhado/indicador-carregamento';
+import { Modal } from '../compartilhado/modal';
 import { SeletorVisualizacao, Visualizacao } from '../compartilhado/seletor-visualizacao';
 import { mensagemDeErro } from '../nucleo/api';
 import { NotificacaoServico } from '../nucleo/notificacao-servico';
@@ -15,7 +18,7 @@ import { PlanoServico } from './plano-servico';
 
 @Component({
   selector: 'app-planos-lista',
-  imports: [CardMetrica, GraficoRosca, IndicadorCarregamento, PlanoFormulario, SeletorVisualizacao],
+  imports: [CardMetrica, DialogoDeConfirmacao, GraficoRosca, IndicadorCarregamento, Modal, PlanoFormulario, SeletorVisualizacao],
   templateUrl: './planos-lista.html',
   styleUrl: './planos-lista.css'
 })
@@ -74,7 +77,7 @@ export class PlanosLista {
 
   // Distribuição para gráficos
   protected readonly distribuicaoPorPlano = computed(() => {
-    return this.criarDistribuicao(
+    return criarDistribuicao(
       this.planosFiltrados().map((plano, indice) => ({
         rotulo: plano.nome,
         total: this.beneficiariosPorPlano().get(plano.id) || 0,
@@ -138,17 +141,6 @@ export class PlanosLista {
 
   protected atualizarFiltroCodigo(evento: Event): void {
     this.filtroCodigoAns.set((evento.target as HTMLInputElement).value);
-  }
-
-  private criarDistribuicao(grupos: { rotulo: string; total: number; cor: string }[]) {
-    const total = grupos.reduce((soma, grupo) => soma + grupo.total, 0);
-    let inicio = 0;
-    return grupos.filter(grupo => grupo.total > 0).map(grupo => {
-      const percentual = total ? (grupo.total / total) * 100 : 0;
-      const resultado = { ...grupo, percentual, inicio };
-      inicio += percentual;
-      return resultado;
-    });
   }
 
   protected solicitarEdicao(plano: Plano): void {

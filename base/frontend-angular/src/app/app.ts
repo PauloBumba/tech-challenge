@@ -1,8 +1,8 @@
 import { Component, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 
-import { StatusDaApi } from './nucleo/status-da-api';
 import { NotificacaoToast } from './compartilhado/notificacao-toast';
+import { StatusDaApi } from './compartilhado/status-da-api';
 
 @Component({
   selector: 'app-root',

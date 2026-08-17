@@ -1,7 +1,7 @@
 import { Component, DestroyRef, OnInit, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
-import { HealthServico } from './health-servico';
+import { HealthServico } from '../nucleo/health-servico';
 
 /**
  * Indicador de saúde no topo da tela. Consulta `GET /health` na carga e em

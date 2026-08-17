@@ -13,7 +13,6 @@ import {
   FormControl,
   FormGroup,
   ReactiveFormsModule,
-  ValidatorFn,
   Validators
 } from '@angular/forms';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
@@ -21,9 +20,10 @@ import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { mensagemDeErro } from '../nucleo/api';
 import { NotificacaoServico } from '../nucleo/notificacao-servico';
 import { Plano } from '../planos/plano';
+import { apenasDigitos, formatarCpf } from '../compartilhado/cpf';
+import { cpfFormatoValido, dataNoPassado } from '../compartilhado/validadores';
 import { Beneficiario, StatusBeneficiario } from './beneficiario';
 import { BeneficiarioServico } from './beneficiario-servico';
-import { apenasDigitos, cpfValido, formatarCpf } from './cpf';
 
 /**
  * Formulário de cadastro e edição de beneficiários. Usa reactive forms para a
@@ -33,8 +33,7 @@ import { apenasDigitos, cpfValido, formatarCpf } from './cpf';
 @Component({
   selector: 'app-beneficiario-formulario',
   imports: [ReactiveFormsModule],
-  templateUrl: './beneficiario-formulario.html',
-  styleUrl: './beneficiario-formulario.css'
+  templateUrl: './beneficiario-formulario.html'
 })
 export class BeneficiarioFormulario implements OnInit {
   private readonly servico = inject(BeneficiarioServico);
@@ -147,23 +146,4 @@ export class BeneficiarioFormulario implements OnInit {
       }
     });
   }
-}
-
-/** O CPF precisa ser válido (formato + dígitos verificadores). */
-function cpfFormatoValido(): ValidatorFn {
-  return (controle) =>
-    cpfValido(controle.value ?? '') ? null : { cpf_invalido: true };
-}
-
-/** Data de nascimento precisa estar no passado. */
-function dataNoPassado(): ValidatorFn {
-  return (controle) => {
-    const valor = controle.value;
-    if (!valor) {
-      return null;
-    }
-
-    const hoje = new Date().toISOString().slice(0, 10);
-    return valor > hoje ? { data_futura: true } : null;
-  };
 }

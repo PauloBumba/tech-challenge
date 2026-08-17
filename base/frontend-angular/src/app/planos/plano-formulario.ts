@@ -31,8 +31,7 @@ import { PlanoServico } from './plano-servico';
 @Component({
   selector: 'app-plano-formulario',
   imports: [ReactiveFormsModule],
-  templateUrl: './plano-formulario.html',
-  styleUrl: './plano-formulario.css'
+  templateUrl: './plano-formulario.html'
 })
 export class PlanoFormulario implements OnInit {
   private readonly servico = inject(PlanoServico);

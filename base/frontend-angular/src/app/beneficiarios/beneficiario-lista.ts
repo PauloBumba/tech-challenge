@@ -3,8 +3,11 @@ import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { BadgeStatus } from '../compartilhado/badge-status';
+import { criarDistribuicao } from '../compartilhado/distribuicao';
+import { DialogoDeConfirmacao } from '../compartilhado/dialogo-de-confirmacao';
 import { GraficoRosca } from '../compartilhado/grafico-rosca';
 import { IndicadorCarregamento } from '../compartilhado/indicador-carregamento';
+import { Modal } from '../compartilhado/modal';
 import { SeletorVisualizacao, Visualizacao } from '../compartilhado/seletor-visualizacao';
 import { mensagemDeErro } from '../nucleo/api';
 import { NotificacaoServico } from '../nucleo/notificacao-servico';
@@ -13,7 +16,7 @@ import { PlanoServico } from '../planos/plano-servico';
 import { Beneficiario, StatusBeneficiario } from './beneficiario';
 import { BeneficiarioFormulario } from './beneficiario-formulario';
 import { BeneficiarioServico } from './beneficiario-servico';
-import { formatarCpf } from './cpf';
+import { formatarCpf } from '../compartilhado/cpf';
 
 /**
  * Listagem de beneficiários: tabela com nome do plano resolvido via `GET /planos`
@@ -23,7 +26,7 @@ import { formatarCpf } from './cpf';
  */
 @Component({
   selector: 'app-beneficiario-lista',
-  imports: [BadgeStatus, BeneficiarioFormulario, GraficoRosca, IndicadorCarregamento, SeletorVisualizacao],
+  imports: [BadgeStatus, BeneficiarioFormulario, DialogoDeConfirmacao, GraficoRosca, IndicadorCarregamento, Modal, SeletorVisualizacao],
   templateUrl: './beneficiario-lista.html',
   styleUrl: './beneficiario-lista.css'
 })
@@ -59,9 +62,9 @@ export class BeneficiarioLista {
       beneficiario.nome_completo.toLocaleLowerCase('pt-BR').includes(termo) ||
       (somenteDigitos.length > 0 && beneficiario.cpf.replace(/\D/g, '').includes(somenteDigitos)));
   });
-  protected readonly distribuicaoPorStatus = computed(() => this.criarDistribuicao(
+  protected readonly distribuicaoPorStatus = computed(() => criarDistribuicao(
     ['ATIVO', 'INATIVO'].map((rotulo, indice) => ({ rotulo, total: this.beneficiariosFiltrados().filter(b => b.status === rotulo).length, cor: indice === 0 ? '#14b8a6' : '#f59e0b' }))));
-  protected readonly distribuicaoPorPlano = computed(() => this.criarDistribuicao(
+  protected readonly distribuicaoPorPlano = computed(() => criarDistribuicao(
     this.planos().map((plano, indice) => ({ rotulo: plano.nome, total: this.beneficiariosFiltrados().filter(b => b.plano_id === plano.id).length, cor: ['#0f766e', '#0ea5e9', '#8b5cf6', '#f97316', '#ec4899'][indice % 5] }))));
   protected readonly rotulosPorStatus = computed(() => this.distribuicaoPorStatus().map(grupo => grupo.rotulo));
   protected readonly valoresPorStatus = computed(() => this.distribuicaoPorStatus().map(grupo => grupo.total));
@@ -148,17 +151,6 @@ export class BeneficiarioLista {
   protected filtrarPorPlano(nome: string): void {
     this.filtroPlanoId.set(this.planos().find(plano => plano.nome === nome)?.id ?? null);
     this.filtrar();
-  }
-
-  private criarDistribuicao(grupos: { rotulo: string; total: number; cor: string }[]) {
-    const total = grupos.reduce((soma, grupo) => soma + grupo.total, 0);
-    let inicio = 0;
-    return grupos.filter(grupo => grupo.total > 0).map(grupo => {
-      const percentual = total ? (grupo.total / total) * 100 : 0;
-      const resultado = { ...grupo, percentual, inicio };
-      inicio += percentual;
-      return resultado;
-    });
   }
 
   // A exclusão só remove a linha depois da resposta de sucesso do DELETE. No
