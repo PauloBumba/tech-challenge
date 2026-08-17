@@ -175,14 +175,36 @@ Status: `todo` | `doing` | `red` (teste escrito e falhando) | `green` (implement
 
 ## Fase 4 — Entrega
 
-- [ ] **TASK-ENT-01** — Build multi-arch (`linux/amd64,linux/arm64`) e publicação das duas
-      imagens no Docker Hub como públicas.
-- [ ] **TASK-ENT-02** — Montar `participantes/<id>/` (`docker-compose.yml` com `image:`,
-      `info.json`, `README.md`) a partir de `participantes/exemplo/`.
-- [ ] **TASK-ENT-03** — Rodar `./verificar.sh participantes/<id>` com Docker limpo até passar.
-- [ ] **TASK-ENT-04** — Escrever o README de entrega: Resumo, Decisões (puxar de
+- [x] **TASK-ENT-01** — Build multi-arch (`linux/amd64,linux/arm64`) e publicação das duas
+      imagens no Docker Hub como públicas. **Feito 2026-08-16**: `bumab/desafio-4tech-api:latest`
+      e `bumab/desafio-4tech-web:latest` publicadas via `docker buildx build --platform
+      linux/amd64,linux/arm64 --push` (ver `ai-change-records/TASK-ENT-01.md`).
+- [x] **TASK-ENT-02** — Montar `participantes/<id>/` (`docker-compose.yml` com `image:`,
+      `info.json`, `README.md`) a partir de `participantes/exemplo/`. **Feito 2026-08-16**:
+      pasta `participantes/paulobumba/` criada com docker-compose.yml (usando imagens
+      publicadas), info.json (identificador paulobumba, stack dotnet-10/postgres-17/angular-20)
+      e README.md completo (Resumo, Decisões, Uso de IA, Perguntas) (ver
+      `ai-change-records/TASK-ENT-02.md`).
+- [x] **TASK-ENT-03** — Rodar `./verificar.sh participantes/<id>` com Docker limpo até passar.
+      **Feito 2026-08-16**: `./verificar.sh participantes/paulobumba` → **37 ok, 0 falha(s) de 37
+      verificações**. Estrutura, subida da aplicação, health, documentação, Planos CRUD,
+      Beneficiários CRUD completo, listagem paginada com filtros — tudo validado (ver
+      `ai-change-records/TASK-ENT-03.md`).
+- [x] **TASK-ENT-04** — Escrever o README de entrega: Resumo, Decisões (puxar de
       `governance/DECISIONS.md`), Uso de IA (puxar de `governance/AI_USAGE.md`), e as 3
-      perguntas de compreensão.
+      perguntas de compreensão. **Feito 2026-08-16**: README completo em
+      `participantes/paulobumba/README.md` com Resumo (20 defeitos corrigidos, CRUD completo,
+      validação CPF, observabilidade, Clean Architecture), Decisões (8 defeitos detalhados,
+      2 pontos omissos, 2 inconsistências, 5 decisões técnicas), Uso de IA (intenso, 3 prompts,
+      o que fiz sem IA, nada não dominado) e Perguntas (concorrência/índice único, defeito
+      crítico, serialização Prometheus) (ver `ai-change-records/TASK-ENT-04.md`).
+
+## Fase 5 — Evolução pós-entrega
+
+- [x] **TASK-OBS-02** — Corrigir a serialização Prometheus dos buckets de duração para que o
+      label `le` fique dentro do conjunto de labels da série. **Feito 2026-08-16**: teste RED
+      para a sintaxe inválida, labels serializados no mesmo conjunto e suíte **85/85 GREEN**
+      (ver `ai-change-records/TASK-OBS-02.md`).
 
 ---
 

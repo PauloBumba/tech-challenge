@@ -300,3 +300,21 @@ Formato:
 - **Porquê:** SOLID (Single Responsibility) — cada entidade tem a própria configuração no próprio
   arquivo, em vez de tudo centralizado no DbContext; segue o mesmo critério de "um tipo por
   arquivo" já adotado em Dominio/Aplicacao (TASK-ARCH-03) e Infraestrutura (TASK-INF-01)
+
+### [TASK-OBS-01] Métricas e log de requisição (SPEC §7 + pedido explícito)
+- **Situação:** escolha técnica livre — a SPEC §7 exige apenas logs estruturados (erro +
+  requisição), health check e OpenAPI; o Paulo pediu explicitamente métricas/observabilidade
+- **O que a spec diz:** SPEC §7 — "logs estruturados, incluindo um log estruturado de requisição
+  e um log estruturado de erro"; o log de erro já existia no `TratamentoDeErroMiddleware`, o de
+  requisição não
+- **Decisão:** **`System.Diagnostics.Metrics` nativo** (Meter/Counter/Histogram) sem pacote
+  externo, serializado em texto Prometheus no `GET /metrics` (contador e histograma de duração
+  por método/rota/status), mais `RegistroDeRequisicaoMiddleware` que loga requisição com
+  template de log e valores como campos (sem interpolação de string — JSON estruturado via
+  `AddJsonConsole`). A rota registrada é o **template** (`beneficiarios/{id:guid}`), não o path
+  com o id concreto, para evitar cardinalidade infinita de séries no scraper
+- **Porquê:** a API nativa do .NET evita dependência externa (escopo do desafio), o formato
+  Prometheus é o padrão de fato para scrapers/Grafana sem SDK, e a rota-template segue a
+  recomendação do Prometheus de cardinalidade controlada. O log de requisição fecha o gap da
+  SPEC §7 sem interpolação (log estruturado de verdade). Nada de escopo além do pedido: sem
+  exportar para OpenTelemetry, sem dashboard

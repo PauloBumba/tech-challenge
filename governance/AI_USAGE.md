@@ -161,10 +161,34 @@ Formato:
 
 ---
 
+### [TASK-OBS-01] Métricas e log de requisição (SPEC §7 + pedido explícito do Paulo)
+- **Nível de uso:** IA como par — o Paulo pediu métricas/observabilidade e aprovou a abordagem;
+  a IA implementou via TDD (teste RED → implementação GREEN)
+- **Prompt que mais influenciou o resultado:** "métrica e observalidade" + "sem quebrar se fugir
+  do que foi pedido sabe" — escopo contido: só `/metrics` + log de requisição, nada de OpenTelemetry
+- **Trecho não trivial gerado:** `MetricasDeRequisicao.SerializarPrometheus` — a serialização do
+  histograma em texto Prometheus (buckets `le`, `_sum`, `_count` com rótulos de método/rota/status)
+  a partir dos instrumentos `System.Diagnostics.Metrics` (Counter/Histogram nativos, sem pacote
+  externo); e o `MetricasMiddleware` que registra a rota-**template** (`beneficiarios/{id:guid}`)
+  em vez do path concreto para não explodir a cardinalidade de séries
+- **Ainda não explicaria com segurança:** não
+
+---
+
 ### [TASK-FE-07] Indicador de saúde da API no frontend
 - **Nível de uso:** IA como par — pedido do Paulo ("analisar a saúde da API a partir do front")
 - **Prompt que mais influenciou o resultado:** "manda para o front esse analisar a saúde da API"
 - **Trecho não trivial gerado:** reuso do padrão da casa (`HttpClient` + `API_BASE` +
   `takeUntilDestroyed(this.destroyRef)`); o teste de "API fora do ar" usa `page.route` com
   `abort` para simular falha de rede/CORS sem depender de derrubar o container
+- **Ainda não explicaria com segurança:** não
+
+---
+
+### [TASK-OBS-02] Sintaxe dos buckets Prometheus
+- **Nível de uso:** IA como par — correção guiada por um teste de integração RED.
+- **Prompt que mais influenciou o resultado:** "continua" — retomada do plano pós-entrega de
+  observabilidade.
+- **Trecho não trivial gerado:** interpolação C# que compõe o conjunto completo de labels,
+  incluindo `le`, dentro das chaves da série de bucket.
 - **Ainda não explicaria com segurança:** não
