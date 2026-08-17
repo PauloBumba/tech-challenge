@@ -19,6 +19,7 @@ import {
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
 import { mensagemDeErro } from '../nucleo/api';
+import { NotificacaoServico } from '../nucleo/notificacao-servico';
 import { Plano } from '../planos/plano';
 import { Beneficiario, StatusBeneficiario } from './beneficiario';
 import { BeneficiarioServico } from './beneficiario-servico';
@@ -37,6 +38,7 @@ import { apenasDigitos, cpfValido, formatarCpf } from './cpf';
 })
 export class BeneficiarioFormulario implements OnInit {
   private readonly servico = inject(BeneficiarioServico);
+  private readonly notificacaoServico = inject(NotificacaoServico);
   private readonly destroyRef = inject(DestroyRef);
 
   // null = cadastro; preenchido = edição (CPF vira somente leitura).
@@ -67,6 +69,16 @@ export class BeneficiarioFormulario implements OnInit {
     if (this.beneficiario) {
       this.preencherParaEdicao();
     }
+
+    // Configurar máscara de CPF automática enquanto digita
+    this.formulario.controls.cpf.valueChanges.pipe(takeUntilDestroyed(this.destroyRef)).subscribe(valor => {
+      if (valor && !this.beneficiario) {
+        const valorMascarado = this.aplicarMascaraCpf(valor);
+        if (valor !== valorMascarado) {
+          this.formulario.controls.cpf.setValue(valorMascarado, { emitEvent: false });
+        }
+      }
+    });
   }
 
   private preencherParaEdicao(): void {
@@ -80,6 +92,22 @@ export class BeneficiarioFormulario implements OnInit {
 
     // CPF não é editável na edição (SPEC 9.4).
     this.formulario.controls.cpf.disable();
+  }
+
+  private aplicarMascaraCpf(valor: string): string {
+    // Remove tudo que não é dígito
+    const digitos = valor.replace(/\D/g, '');
+    
+    // Aplica a máscara: 000.000.000-00
+    if (digitos.length <= 3) {
+      return digitos;
+    } else if (digitos.length <= 6) {
+      return `${digitos.slice(0, 3)}.${digitos.slice(3)}`;
+    } else if (digitos.length <= 9) {
+      return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6)}`;
+    } else {
+      return `${digitos.slice(0, 3)}.${digitos.slice(3, 6)}.${digitos.slice(6, 9)}-${digitos.slice(9, 11)}`;
+    }
   }
 
   protected salvar(): void {
@@ -107,7 +135,12 @@ export class BeneficiarioFormulario implements OnInit {
     this.erro.set(null);
 
     resultado.pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => this.salvo.emit(),
+      next: () => {
+        this.notificacaoServico.sucesso(
+          this.beneficiario ? 'Beneficiário atualizado com sucesso!' : 'Beneficiário cadastrado com sucesso!'
+        );
+        this.salvo.emit();
+      },
       error: (resposta: HttpErrorResponse) => {
         this.erro.set(mensagemDeErro(resposta));
         this.enviando.set(false);
