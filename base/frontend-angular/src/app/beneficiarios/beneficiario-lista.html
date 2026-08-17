@@ -1,19 +1,14 @@
 <section class="cartao">
   <header class="cabecalho">
-    <h2>Beneficiários</h2>
-    <button type="button" class="botao primario" (click)="abrirCadastro()">Novo beneficiário</button>
+    <div><p class="sobretitulo">Cadastro assistencial</p><h2>Beneficiários</h2><span>Organize, consulte e acompanhe sua base.</span></div>
+    <div class="acoes-principais"><button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">↻ Recarregar</button><button type="button" class="botao primario" (click)="modalNovoAberto.set(true)">+ Novo beneficiário</button></div>
   </header>
 
-  @if (formularioAberto()) {
-    <app-beneficiario-formulario
-      [beneficiario]="beneficiarioEmEdicao()"
-      [planos]="planos()"
-      (salvo)="aoSalvar()"
-      (cancelado)="fecharFormulario()"
-    />
-  }
-
   <div class="filtros">
+    <label class="campo-busca">
+      <span>Buscar</span>
+      <input type="search" placeholder="Nome ou CPF nesta página" [value]="termoBusca()" (input)="atualizarBusca($event)" />
+    </label>
     <label>
       <span>Situação</span>
       <select
@@ -40,18 +35,23 @@
       </select>
     </label>
 
-    <button type="button" class="botao" (click)="carregar()" [disabled]="carregando()">
-      Recarregar
-    </button>
   </div>
 
   @if (carregando()) {
-    <p class="aviso">Carregando beneficiários...</p>
+    <app-indicador-carregamento mensagem="Carregando beneficiários..." />
   } @else if (erro()) {
     <p class="aviso erro">{{ erro() }}</p>
   } @else if (beneficiarios().length === 0) {
     <p class="aviso">Nenhum beneficiário encontrado.</p>
   } @else {
+    <section class="painel-distribuicao" aria-label="Distribuição dos beneficiários visíveis">
+      <div class="cabecalho-distribuicao"><div><h3>Distribuição atual</h3><p>Os gráficos refletem os {{ beneficiariosFiltrados().length }} registro(s) visíveis nesta página.</p></div><app-seletor-visualizacao [valor]="visualizacao()" (valorChange)="mudarVisualizacao($event)" /></div>
+      <div class="graficos-pizza">
+        <app-grafico-rosca titulo="Distribuição de situações" [rotulos]="rotulosPorStatus()" [valores]="valoresPorStatus()" [cores]="coresPorStatus()" (itemSelecionado)="filtrarPorSituacao($event)" />
+        <app-grafico-rosca titulo="Distribuição por plano" [rotulos]="rotulosPorPlano()" [valores]="valoresPorPlano()" [cores]="coresPorPlano()" (itemSelecionado)="filtrarPorPlano($event)" />
+      </div>
+    </section>
+    @if (beneficiariosFiltrados().length === 0) {<p class="aviso">Nenhum resultado para a busca nesta página.</p>} @else if (visualizacao() === 'tabela') {
     <table>
       <thead>
         <tr>
@@ -64,23 +64,38 @@
         </tr>
       </thead>
       <tbody>
-        @for (beneficiario of beneficiarios(); track beneficiario.id) {
+        @for (beneficiario of beneficiariosFiltrados(); track beneficiario.id) {
           <tr>
             <td>{{ beneficiario.nome_completo }}</td>
             <td>{{ formatarCpf(beneficiario.cpf) }}</td>
             <td>{{ beneficiario.data_nascimento }}</td>
             <td>
-              <span class="status" [class]="'status ' + beneficiario.status">{{ beneficiario.status }}</span>
+              <app-badge-status [status]="beneficiario.status" />
             </td>
             <td>{{ nomeDoPlano(beneficiario.plano_id) }}</td>
             <td class="coluna-acoes">
-              <button type="button" class="botao" (click)="abrirEdicao(beneficiario)">Editar</button>
-              <button type="button" class="botao" (click)="excluir(beneficiario)">Excluir</button>
+              <button type="button" class="botao" (click)="solicitarEdicao(beneficiario)">Editar</button>
+              <button type="button" class="botao" (click)="solicitarExclusao(beneficiario)">Excluir</button>
             </td>
           </tr>
         }
       </tbody>
     </table>
+    } @else if (visualizacao() === 'grade') {
+      <div class="grade-beneficiarios">@for (beneficiario of beneficiariosFiltrados(); track beneficiario.id) {<article class="cartao-beneficiario"><div class="cartao-beneficiario-topo"><div><strong>{{ beneficiario.nome_completo }}</strong><span>{{ formatarCpf(beneficiario.cpf) }}</span></div><app-badge-status [status]="beneficiario.status" /></div><dl><div><dt>Plano</dt><dd>{{ nomeDoPlano(beneficiario.plano_id) }}</dd></div><div><dt>Nascimento</dt><dd>{{ beneficiario.data_nascimento }}</dd></div></dl><div class="acoes-cartao"><button type="button" (click)="solicitarEdicao(beneficiario)">Editar</button><button type="button" (click)="solicitarExclusao(beneficiario)">Excluir</button></div></article>}</div>
+    } @else {
+      <div class="kanban">
+        @for (status of ['ATIVO', 'INATIVO']; track status) {
+          <section class="coluna-kanban" [class.destino-arraste]="arrastado()" (dragover)="$event.preventDefault()" (drop)="arrastado() && moverParaStatus(arrastado()!, $any(status))"><h3>{{ status }}</h3><small>Arraste um cartão para alterar a situação</small>
+            @for (beneficiario of beneficiariosFiltrados(); track beneficiario.id) {
+              @if (beneficiario.status === status) {
+                <article class="cartao-kanban" draggable="true" (dragstart)="arrastado.set(beneficiario)" (dragend)="arrastado.set(null)"><strong>{{ beneficiario.nome_completo }}</strong><span>{{ formatarCpf(beneficiario.cpf) }}</span><span>{{ nomeDoPlano(beneficiario.plano_id) }}</span><button type="button" (click)="solicitarEdicao(beneficiario)">Editar</button></article>
+              }
+            }
+          </section>
+        }
+      </div>
+    }
 
     <footer class="paginacao">
       <span>
@@ -107,3 +122,17 @@
     </footer>
   }
 </section>
+
+@if (modalNovoAberto()) {
+  <div class="sobreposicao" role="presentation" (click)="modalNovoAberto.set(false)">
+    <section class="modal" role="dialog" aria-modal="true" aria-label="Novo beneficiário" (click)="$event.stopPropagation()"><app-beneficiario-formulario [planos]="planos()" (salvo)="modalNovoAberto.set(false); carregar()" (cancelado)="modalNovoAberto.set(false)" /></section>
+  </div>
+}
+@if (modalEdicaoAberto()) {
+  <div class="sobreposicao" role="presentation" (click)="modalEdicaoAberto.set(false)">
+    <section class="modal" role="dialog" aria-modal="true" aria-label="Editar beneficiário" (click)="$event.stopPropagation()"><app-beneficiario-formulario [beneficiario]="beneficiarioParaEditar()" [planos]="planos()" (salvo)="modalEdicaoAberto.set(false); carregar()" (cancelado)="modalEdicaoAberto.set(false)" /></section>
+  </div>
+}
+@if (beneficiarioParaExcluir(); as beneficiario) {
+  <div class="sobreposicao" role="presentation"><section class="dialogo-confirmacao" role="alertdialog" aria-modal="true" aria-labelledby="titulo-exclusao"><div class="icone-alerta">!</div><div><h3 id="titulo-exclusao">Excluir beneficiário?</h3><p>Você está prestes a excluir <strong>{{ beneficiario.nome_completo }}</strong>. Esta ação remove o cadastro da lista.</p></div><footer><button type="button" class="botao" (click)="beneficiarioParaExcluir.set(null)">Cancelar</button><button type="button" class="botao perigo" (click)="confirmarExclusao()">Excluir beneficiário</button></footer></section></div>
+}

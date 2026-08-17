@@ -1,13 +1,18 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, computed, inject, signal } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 
+import { BadgeStatus } from '../compartilhado/badge-status';
+import { GraficoRosca } from '../compartilhado/grafico-rosca';
+import { IndicadorCarregamento } from '../compartilhado/indicador-carregamento';
+import { SeletorVisualizacao, Visualizacao } from '../compartilhado/seletor-visualizacao';
 import { mensagemDeErro } from '../nucleo/api';
+import { NotificacaoServico } from '../nucleo/notificacao-servico';
 import { Plano } from '../planos/plano';
 import { PlanoServico } from '../planos/plano-servico';
 import { Beneficiario, StatusBeneficiario } from './beneficiario';
-import { BeneficiarioServico } from './beneficiario-servico';
 import { BeneficiarioFormulario } from './beneficiario-formulario';
+import { BeneficiarioServico } from './beneficiario-servico';
 import { formatarCpf } from './cpf';
 
 /**
@@ -18,13 +23,14 @@ import { formatarCpf } from './cpf';
  */
 @Component({
   selector: 'app-beneficiario-lista',
-  imports: [BeneficiarioFormulario],
+  imports: [BadgeStatus, BeneficiarioFormulario, GraficoRosca, IndicadorCarregamento, SeletorVisualizacao],
   templateUrl: './beneficiario-lista.html',
   styleUrl: './beneficiario-lista.css'
 })
 export class BeneficiarioLista {
   private readonly servico = inject(BeneficiarioServico);
   private readonly planoServico = inject(PlanoServico);
+  private readonly notificacaoServico = inject(NotificacaoServico);
   private readonly destroyRef = inject(DestroyRef);
 
   protected readonly beneficiarios = signal<Beneficiario[]>([]);
@@ -38,9 +44,33 @@ export class BeneficiarioLista {
 
   protected readonly filtroStatus = signal<StatusBeneficiario | null>(null);
   protected readonly filtroPlanoId = signal<string | null>(null);
+  protected readonly termoBusca = signal('');
+  protected readonly visualizacao = signal<Visualizacao>('tabela');
+  protected readonly modalNovoAberto = signal(false);
+  protected readonly modalEdicaoAberto = signal(false);
+  protected readonly beneficiarioParaEditar = signal<Beneficiario | null>(null);
+  protected readonly beneficiarioParaExcluir = signal<Beneficiario | null>(null);
+  protected readonly arrastado = signal<Beneficiario | null>(null);
+  protected readonly beneficiariosFiltrados = computed(() => {
+    const termo = this.termoBusca().trim().toLocaleLowerCase('pt-BR');
+    if (!termo) return this.beneficiarios();
+    const somenteDigitos = termo.replace(/\D/g, '');
+    return this.beneficiarios().filter(beneficiario =>
+      beneficiario.nome_completo.toLocaleLowerCase('pt-BR').includes(termo) ||
+      (somenteDigitos.length > 0 && beneficiario.cpf.replace(/\D/g, '').includes(somenteDigitos)));
+  });
+  protected readonly distribuicaoPorStatus = computed(() => this.criarDistribuicao(
+    ['ATIVO', 'INATIVO'].map((rotulo, indice) => ({ rotulo, total: this.beneficiariosFiltrados().filter(b => b.status === rotulo).length, cor: indice === 0 ? '#14b8a6' : '#f59e0b' }))));
+  protected readonly distribuicaoPorPlano = computed(() => this.criarDistribuicao(
+    this.planos().map((plano, indice) => ({ rotulo: plano.nome, total: this.beneficiariosFiltrados().filter(b => b.plano_id === plano.id).length, cor: ['#0f766e', '#0ea5e9', '#8b5cf6', '#f97316', '#ec4899'][indice % 5] }))));
+  protected readonly rotulosPorStatus = computed(() => this.distribuicaoPorStatus().map(grupo => grupo.rotulo));
+  protected readonly valoresPorStatus = computed(() => this.distribuicaoPorStatus().map(grupo => grupo.total));
+  protected readonly coresPorStatus = computed(() => this.distribuicaoPorStatus().map(grupo => grupo.cor));
+  protected readonly rotulosPorPlano = computed(() => this.distribuicaoPorPlano().map(grupo => grupo.rotulo));
+  protected readonly valoresPorPlano = computed(() => this.distribuicaoPorPlano().map(grupo => grupo.total));
+  protected readonly coresPorPlano = computed(() => this.distribuicaoPorPlano().map(grupo => grupo.cor));
 
-  protected readonly formularioAberto = signal(false);
-  protected readonly beneficiarioEmEdicao = signal<Beneficiario | null>(null);
+  protected mudarVisualizacao(valor: Visualizacao): void { this.visualizacao.set(valor); }
 
   constructor() {
     this.carregarPlanos();
@@ -106,38 +136,69 @@ export class BeneficiarioLista {
     return formatarCpf(cpf);
   }
 
-  protected abrirCadastro(): void {
-    this.beneficiarioEmEdicao.set(null);
-    this.formularioAberto.set(true);
+  protected atualizarBusca(evento: Event): void {
+    this.termoBusca.set((evento.target as HTMLInputElement).value);
   }
 
-  protected abrirEdicao(beneficiario: Beneficiario): void {
-    this.beneficiarioEmEdicao.set(beneficiario);
-    this.formularioAberto.set(true);
+  protected filtrarPorSituacao(status: string): void {
+    this.filtroStatus.set(status as StatusBeneficiario);
+    this.filtrar();
   }
 
-  protected fecharFormulario(): void {
-    this.formularioAberto.set(false);
-    this.beneficiarioEmEdicao.set(null);
+  protected filtrarPorPlano(nome: string): void {
+    this.filtroPlanoId.set(this.planos().find(plano => plano.nome === nome)?.id ?? null);
+    this.filtrar();
   }
 
-  protected aoSalvar(): void {
-    this.fecharFormulario();
-    this.carregar();
+  private criarDistribuicao(grupos: { rotulo: string; total: number; cor: string }[]) {
+    const total = grupos.reduce((soma, grupo) => soma + grupo.total, 0);
+    let inicio = 0;
+    return grupos.filter(grupo => grupo.total > 0).map(grupo => {
+      const percentual = total ? (grupo.total / total) * 100 : 0;
+      const resultado = { ...grupo, percentual, inicio };
+      inicio += percentual;
+      return resultado;
+    });
   }
 
   // A exclusão só remove a linha depois da resposta de sucesso do DELETE. No
   // `error` a linha continua na tela e a mensagem da API aparece para o usuário.
-  protected excluir(beneficiario: Beneficiario): void {
-    if (!window.confirm(`Excluir o beneficiário ${beneficiario.nome_completo}?`)) {
-      return;
-    }
+  protected solicitarEdicao(beneficiario: Beneficiario): void {
+    this.beneficiarioParaEditar.set(beneficiario);
+    this.modalEdicaoAberto.set(true);
+  }
 
+  protected solicitarExclusao(beneficiario: Beneficiario): void {
+    this.beneficiarioParaExcluir.set(beneficiario);
+  }
+
+  protected confirmarExclusao(): void {
+    const beneficiario = this.beneficiarioParaExcluir();
+    if (!beneficiario) return;
     this.servico.excluir(beneficiario.id).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
-      next: () => this.carregar(),
+      next: () => {
+        this.notificacaoServico.sucesso('Beneficiário excluído com sucesso!');
+        this.beneficiarioParaExcluir.set(null);
+        this.carregar();
+      },
       error: (resposta: HttpErrorResponse) => {
         this.erro.set(mensagemDeErro(resposta));
+        this.beneficiarioParaExcluir.set(null);
       }
+    });
+  }
+
+  protected moverParaStatus(beneficiario: Beneficiario, status: StatusBeneficiario): void {
+    this.arrastado.set(null);
+    if (beneficiario.status === status) return;
+    this.servico.atualizar(beneficiario.id, {
+      nome_completo: beneficiario.nome_completo,
+      data_nascimento: beneficiario.data_nascimento,
+      plano_id: beneficiario.plano_id,
+      status
+    }).pipe(takeUntilDestroyed(this.destroyRef)).subscribe({
+      next: () => this.carregar(),
+      error: (resposta: HttpErrorResponse) => this.erro.set(mensagemDeErro(resposta))
     });
   }
 }
